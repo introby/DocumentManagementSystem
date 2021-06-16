@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Create account</title>
+
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+
+</head>
+<body>
+<form action="#" th:action="@{/user/new}" th:object="${userAccount}" method="post">
+    <label for="username">Username</label>
+    <input type="text" th:field="*{username}" id="username" placeholder="Username">
+    <div style="color:red" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Error</div>
+    <label for="password">Password</label>
+    <input type="text" th:field="*{password}" id="password" placeholder="Password">
+    <div style="color:red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Error</div>
+    <label for="firstName">First name</label>
+    <input type="text" th:field="*{firstName}" id="firstName" placeholder="First Name">
+    <div style="color:red" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}">Error</div>
+    <label for="lastName">Last name</label>
+    <input type="text" th:field="*{lastName}" id="lastName" placeholder="Last Name">
+    <div style="color:red" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}">Error</div>
+    <label>Role</label>
+    <select name="role">
+        <option th:each="role : ${T(by.intro.dms.model.Role).values()}"
+                th:value="${role}" th:text="${role}"></option>
+    </select>
+    <label>Status</label>
+    <select name="status">
+        <option th:each="status : ${T(by.intro.dms.model.Status).values()}"
+                th:value="${status}" th:text="${status}"></option>
+    </select>
+
+    <input type="submit" value="Create User">
+</form>
+<p><a href="/user">To accounts list</a></p>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Documents</title>
+
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+
+</head>
+<body>
+<br/>
+<form action="/logout" method="POST">
+    <button type="submit">Logout</button>
+</form>
+<br/>
+<div class="container my-2" th:switch="${allDocs}">
+    <h2 th:case="null">No docs found!</h2>
+    <div th:case="*">
+        <h2>Documents</h2>
+        <p><a href="/document/new" class="btn btn-primary btn-sm mb-3">Create document</a></p>
+        <div class="row col-sm-10">
+            <form action="#" th:action="@{'/document?size=' + ${allDocs.size} +
+                    '&page=1&sort=documentName&sortDir=' + ${reverseSortDir} +
+                    '&keyword=' + ${searchValue}}" th:object="${value}" method="get">
+                <input type="text" id="txtSearch" name="keyword" placeholder="Search">
+                <button type="submit" value="Search">GO</button>
+            </form>&nbsp;
+            <form action="#" th:action="@{'/document?size=' + ${allDocs.size} +
+                    '&page=1&sort=documentName&sortDir=' + ${reverseSortDir} +
+                    '&keyword=' + ${searchValue}}" th:object="${value}" method="get">
+                <button type="submit" value="Search">Clear</button>
+            </form>
+        </div>
+        <table border="1" class="table table-striped table-responsive-md">
+            <thead>
+            <tr>
+                <th>
+                    <a th:href="@{'/document?size=' + ${allDocs.size} +
+                    '&page=1&sort=documentId&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
+                        ID</a></th>
+                <th>
+                    <a th:href="@{'/document/?size=' + ${allDocs.size} +
+                    '&page=1&sort=documentName&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
+                        Document Name</a></th>
+                <th>
+                    <a th:href="@{'/document/?size=' + ${allDocs.size} +
+                    '&page=1&sort=createdAt&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
+                        Created At</a></th>
+                <th>
+                    <a th:href="@{'/document?size=' + ${allDocs.size} +
+                    '&page=1&sort=supplier&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
+                        Supplier</a></th>
+                <th>
+                    <a th:href="@{'/document?size=' + ${allDocs.size} +
+                    '&page=1&sort=consumer&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
+                        Consumer</a></th>
+                <th>
+                    <a th:href="@{'/document?size=' + ${allDocs.size} +
+                    '&page=1&sort=contractTerm&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
+                        Contract Term</a></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="document : ${allDocs}">
+                <td th:text="${document.documentId}"></td>
+                <td th:text="${document.documentName}"></td>
+                <td th:text="${document.createdAt}"></td>
+                <td th:text="${document.supplier}"></td>
+                <td th:text="${document.consumer}"></td>
+                <td th:text="${document.contractTerm}"></td>
+                <td><a th:href="@{/document/{id}(id=${document.documentId})}" class="btn btn-primary">View</a></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div th:if="${allDocs.totalPages > 0}">
+            <div class="row col-sm-10">
+                <div>
+					<span th:each="pageNumber : ${pageNumbers}">
+						<a th:href="@{'/document/?size=' + ${allDocs.size} +
+						'&page=' + ${pageNumber} + '&sort=' + ${sortField} +
+						'&sortDir=' + ${sortDir} + '&keyword=' + ${searchValue}}"
+                           th:text=${pageNumber}></a>
+						&nbsp; &nbsp;
+					</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+<br/>
+
+</body>
+</html>
