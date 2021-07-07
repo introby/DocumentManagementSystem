@@ -1,6 +1,10 @@
 package by.intro.dms.service;
 
 import by.intro.dms.model.Document;
+import by.intro.dms.model.DocumentPage;
+import by.intro.dms.model.DocumentRequest;
+import by.intro.dms.model.DocumentSearchCriteria;
+import by.intro.dms.repository.DocumentCriteriaRepository;
 import by.intro.dms.repository.DocumentRepository;
 import org.hibernate.Filter;
 import org.hibernate.Session;
@@ -10,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
+import javax.print.Doc;
 import java.util.Optional;
 
 @Service
@@ -20,6 +25,9 @@ public class DocumentService {
 
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private DocumentCriteriaRepository documentCriteriaRepository;
 
     public DocumentService() {
     }
@@ -44,5 +52,10 @@ public class DocumentService {
 
     public void deleteById(Long documentId) {
         documentRepository.deleteById(documentId);
+    }
+
+    public Page<Document> getDocuments(DocumentRequest documentRequest) {
+        return documentCriteriaRepository.findAllWithFilters(documentRequest.getDocumentPage(),
+                documentRequest.getDocumentSearchCriteria());
     }
 }
