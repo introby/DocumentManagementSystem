@@ -12,8 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/search")
-public class DocumentSearchController {
+@RequestMapping("/cr-search")
+public class DocumentCriteriaSearchController {
     @Autowired
     private DocumentService documentService;
 

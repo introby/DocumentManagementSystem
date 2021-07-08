@@ -58,4 +58,5 @@ public class DocumentService {
         return documentCriteriaRepository.findAllWithFilters(documentRequest.getDocumentPage(),
                 documentRequest.getDocumentSearchCriteria());
     }
+
 }

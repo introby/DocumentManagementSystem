@@ -14,5 +14,6 @@ public class DocumentSearchCriteria {
     private LocalDate dateFrom;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateTo;
+//    private DocStatus[] docStatus;
     private List<DocStatus> docStatus;
 }

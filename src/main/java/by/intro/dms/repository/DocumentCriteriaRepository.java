@@ -73,21 +73,18 @@ public class DocumentCriteriaRepository {
 
         List<DocStatus> docStatus = documentSearchCriteria.getDocStatus();
 
-        Predicate docStatus1 = criteriaBuilder.equal(documentRoot.get("docStatus"), docStatus.get(0));
-        Predicate docStatus2 = criteriaBuilder.equal(documentRoot.get("docStatus"), docStatus.get(1));
+        if (Objects.nonNull(docStatus)) {
 
-        Predicate docStatusPred = criteriaBuilder.or(docStatus1, docStatus2);
+            List<Predicate> listStatus = new ArrayList<>();
+            for (int i = 0; i < docStatus.size(); i++) {
+                listStatus.add(criteriaBuilder.equal(documentRoot.get("docStatus"), docStatus.get(i)));
+            }
 
-//        if (Objects.nonNull(documentSearchCriteria.getDocStatus())) {
-//            String[] statuses = documentSearchCriteria.getDocStatus().split(",");
-//            for (String status : statuses) {
-//                predicates.add(criteriaBuilder.equal(documentRoot.get("docStatus"),
-//                        status)
-//                );
-//            }
-//        }
+            Predicate docStatusPred = listStatus.stream().reduce(criteriaBuilder::or).get();
 
-        predicates.add(docStatusPred);
+            predicates.add(docStatusPred);
+
+        }
 
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     }
