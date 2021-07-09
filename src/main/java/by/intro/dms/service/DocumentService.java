@@ -1,9 +1,7 @@
 package by.intro.dms.service;
 
 import by.intro.dms.model.Document;
-import by.intro.dms.model.DocumentPage;
 import by.intro.dms.model.DocumentRequest;
-import by.intro.dms.model.DocumentSearchCriteria;
 import by.intro.dms.repository.DocumentCriteriaRepository;
 import by.intro.dms.repository.DocumentRepository;
 import org.hibernate.Filter;
@@ -14,7 +12,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
-import javax.print.Doc;
 import java.util.Optional;
 
 @Service

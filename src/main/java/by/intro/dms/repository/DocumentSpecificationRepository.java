@@ -8,7 +8,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.criteria.Predicate;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,53 +28,49 @@ public class DocumentSpecificationRepository {
         DocumentSearchCriteria documentSearchCriteria = documentRequest.getDocumentSearchCriteria();
         List<Specification<Document>> specificationList = new ArrayList<>();
 
-//        if (Objects.nonNull(documentSearchCriteria.getDocumentName())) {
-//            specificationList.add(documentNameLike(documentSearchCriteria.getDocumentName()));
-//        }
-//
-//        if (Objects.nonNull(documentSearchCriteria.getConsumer())) {
-//            specificationList.add(consumerEqual(documentSearchCriteria.getConsumer()));
-//        }
-//
-//        if (Objects.nonNull(documentSearchCriteria.getDateFrom())
-//                && Objects.nonNull(documentSearchCriteria.getDateTo())) {
-//            specificationList.add(dateBetween(documentSearchCriteria.getDateFrom(),
-//                    documentSearchCriteria.getDateTo()));
-//        }
-//
-//        if (Objects.nonNull(documentSearchCriteria.getDocStatus())) {
-//            specificationList.add(docStatusMultiselect(documentSearchCriteria.getDocStatus()));
-//        }
-//
-//        //доделать на нулл
+        if (Objects.nonNull(documentSearchCriteria.getDocumentName())) {
+            specificationList.add(documentNameLike(documentSearchCriteria.getDocumentName()));
+        }
 
-        return documentRepository.findAll(Specification.where(
-                documentNameLike(documentSearchCriteria.getDocumentName())
-                .and(consumerEqual(documentSearchCriteria.getConsumer()))
-                .and(dateBetween(documentSearchCriteria.getDateFrom(), documentSearchCriteria.getDateTo()))
-                .and(docStatusMultiselect(documentSearchCriteria.getDocStatus()))),
-                pageable);
+        if (Objects.nonNull(documentSearchCriteria.getConsumer())) {
+            specificationList.add(consumerEqual(documentSearchCriteria.getConsumer()));
+        }
+
+        if (Objects.nonNull(documentSearchCriteria.getDateFrom())
+                && Objects.nonNull(documentSearchCriteria.getDateTo())) {
+            specificationList.add(dateBetween(documentSearchCriteria.getDateFrom(),
+                    documentSearchCriteria.getDateTo()));
+        }
+
+        if (Objects.nonNull(documentSearchCriteria.getDocStatus())) {
+            specificationList.add(docStatusMultiselect(documentSearchCriteria.getDocStatus()));
+        }
+
+        return documentRepository.findAll(
+                Specification.where(specificationList.stream().reduce((Specification::and)).get()),
+                pageable
+        );
     }
 
-    private Specification<Document> documentNameLike(String documentName){
+    private Specification<Document> documentNameLike(String documentName) {
 
         return (root, query, criteriaBuilder) ->
-                criteriaBuilder.like(root.get(Document_.DOCUMENT_NAME), "%"+documentName+"%");
+                criteriaBuilder.like(root.get(Document_.DOCUMENT_NAME), "%" + documentName + "%");
     }
 
-    private Specification<Document> consumerEqual(String consumer){
+    private Specification<Document> consumerEqual(String consumer) {
 
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get(Document_.CONSUMER), consumer);
     }
 
-    private Specification<Document> dateBetween(LocalDate dateFrom, LocalDate dateTo){
+    private Specification<Document> dateBetween(LocalDate dateFrom, LocalDate dateTo) {
 
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.between(root.get(Document_.CONTRACT_TERM), dateFrom, dateTo);
     }
 
-    private Specification<Document> docStatusMultiselect(List<DocStatus> docStatusList){
+    private Specification<Document> docStatusMultiselect(List<DocStatus> docStatusList) {
 
         List<Specification<Document>> listStatus = new ArrayList<>();
 
@@ -86,9 +81,7 @@ public class DocumentSpecificationRepository {
             listStatus.add(spec);
         }
 
-        Specification<Document> statusSpecification = listStatus.stream().reduce((Specification::or)).get();
-
-        return statusSpecification;
+        return listStatus.stream().reduce((Specification::or)).get();
     }
 
     private Pageable getPageable(DocumentPage documentPage) {
