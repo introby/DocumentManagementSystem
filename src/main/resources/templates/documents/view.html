@@ -22,6 +22,7 @@
         <th>Contract Term</th>
         <th>Status</th>
         <th>Description</th>
+        <th>Price, EUR</th>
     </tr>
     </thead>
     <tbody>
@@ -34,10 +35,11 @@
         <td th:text="${document.contractTerm}"></td>
         <td th:text="${document.docStatus}"></td>
         <td th:text="${document.description}"></td>
+        <td th:text="${document.price}"></td>
         <td><a th:href="@{{id}/edit(id=${document.documentId})}" class="btn btn-primary">Edit</a></td>
         <td><a th:href="@{{id}/delete(id=${document.documentId})}" class="btn btn-danger">Delete</a></td>
     </tbody>
 </table>
-<p><a href="/document">List of documents</a></p>
+<p><a href="/documents">List of documents</a></p>
 </body>
 </html>

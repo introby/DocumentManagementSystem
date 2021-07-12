@@ -20,6 +20,11 @@ import java.util.Objects;
 @Repository
 public class DocumentCriteriaRepository {
 
+    private final String DOCUMENT_NAME = "documentName";
+    private final String CONSUMER = "consumer";
+    private final String CONTRACT_TERM = "contractTerm";
+    private final String DOC_STATUS = "docStatus";
+
     private final EntityManager entityManager;
     private final CriteriaBuilder criteriaBuilder;
 
@@ -52,20 +57,21 @@ public class DocumentCriteriaRepository {
                                    Root<Document> documentRoot) {
         List<Predicate> predicates = new ArrayList<>();
         if (Objects.nonNull(documentSearchCriteria.getDocumentName())) {
-            predicates.add(criteriaBuilder.like(documentRoot.get("documentName"),
-                    "%" + documentSearchCriteria.getDocumentName() + "%")
+            String docName = String.format("%%%s%%", documentSearchCriteria.getDocumentName());
+            predicates.add(criteriaBuilder.like(documentRoot.get(DOCUMENT_NAME), docName)
             );
         }
 
+
         if (Objects.nonNull(documentSearchCriteria.getConsumer())) {
-            predicates.add(criteriaBuilder.equal(documentRoot.get("consumer"),
+            predicates.add(criteriaBuilder.equal(documentRoot.get(CONSUMER),
                     documentSearchCriteria.getConsumer())
             );
         }
 
         if (Objects.nonNull(documentSearchCriteria.getDateFrom())
                 && Objects.nonNull(documentSearchCriteria.getDateTo())) {
-            predicates.add(criteriaBuilder.between(documentRoot.get("contractTerm"),
+            predicates.add(criteriaBuilder.between(documentRoot.get(CONTRACT_TERM),
                     documentSearchCriteria.getDateFrom(),
                     documentSearchCriteria.getDateTo())
             );
@@ -74,16 +80,12 @@ public class DocumentCriteriaRepository {
         List<DocStatus> docStatus = documentSearchCriteria.getDocStatus();
 
         if (Objects.nonNull(docStatus)) {
-
-            List<Predicate> listStatus = new ArrayList<>();
-            for (int i = 0; i < docStatus.size(); i++) {
-                listStatus.add(criteriaBuilder.equal(documentRoot.get("docStatus"), docStatus.get(i)));
-            }
-
-            Predicate docStatusPred = listStatus.stream().reduce(criteriaBuilder::or).get();
-
-            predicates.add(docStatusPred);
-
+            predicates.add(docStatus
+                    .stream()
+                    .map(ds -> criteriaBuilder.equal(documentRoot.get(DOC_STATUS), ds))
+                    .reduce(criteriaBuilder::or)
+                    .get()
+            );
         }
 
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

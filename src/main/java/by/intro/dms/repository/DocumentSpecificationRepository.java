@@ -1,24 +1,22 @@
 package by.intro.dms.repository;
 
 import by.intro.dms.model.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import by.intro.dms.model.Currency;
+import by.intro.dms.service.CurrencyService;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
+import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Repository
 public class DocumentSpecificationRepository {
 
     private final DocumentRepository documentRepository;
 
-    public DocumentSpecificationRepository(DocumentRepository documentRepository) {
+    public DocumentSpecificationRepository(DocumentRepository documentRepository, CurrencyService currencyService) {
         this.documentRepository = documentRepository;
     }
 
@@ -44,6 +42,36 @@ public class DocumentSpecificationRepository {
 
         if (Objects.nonNull(documentSearchCriteria.getDocStatus())) {
             specificationList.add(docStatusMultiselect(documentSearchCriteria.getDocStatus()));
+        }
+
+        Currency currency = documentSearchCriteria.getCurrency();
+
+        if (Objects.nonNull(currency) && !"EUR".equals(currency.name())) {
+            Map<String, Float> rates = new HashMap<>();
+            Page<Document> pageList = documentRepository.findAll(
+                    Specification.where(specificationList.stream().reduce((Specification::and)).get()), pageable);
+            try {
+                rates = CurrencyService.getRates();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            float eurToByn = rates.get("EUR") / rates.get("BYN");
+            float eurToUsd = rates.get("EUR") / rates.get("USD");
+
+            if ("BYN".equals(currency.name())) {
+                pageList.stream().forEach(document -> {
+                    document.setPrice(document.getPrice() * eurToByn);
+                    document.setCurrency(Currency.BYN);
+                });
+            } else {
+                pageList.stream().forEach(document -> {
+                    document.setPrice(document.getPrice() * eurToUsd);
+                    document.setCurrency(Currency.USD);
+                });
+            }
+
+            return pageList;
         }
 
         return documentRepository.findAll(

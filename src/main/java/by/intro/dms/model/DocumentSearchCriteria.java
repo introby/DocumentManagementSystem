@@ -15,4 +15,5 @@ public class DocumentSearchCriteria {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateTo;
     private List<DocStatus> docStatus;
+    private Currency currency = Currency.EUR;
 }

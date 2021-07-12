@@ -2,7 +2,6 @@ package by.intro.dms.controller;
 
 import by.intro.dms.model.Document;
 import by.intro.dms.service.DocumentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -20,16 +19,19 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Controller
-@RequestMapping("/document")
+@RequestMapping("/documents")
 public class DocumentsController {
 
-    @Autowired
-    private DocumentService documentService;
+    private final DocumentService documentService;
+
+    public DocumentsController(DocumentService documentService) {
+        this.documentService = documentService;
+    }
 
     @GetMapping("/new")
     @PreAuthorize("hasAuthority('accounts:read')")
     public String createDocumentForm(Document document) {
-        return "document/new";
+        return "documents/new";
     }
 
     @PostMapping("/new")
@@ -37,11 +39,11 @@ public class DocumentsController {
     public String createDocument(@Valid Document document, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors())
-            return "document/new";
+            return "documents/new";
 
         document.setCreatedAt(LocalDate.now());
         documentService.saveDocument(document);
-        return "redirect:/document";
+        return "redirect:/documents";
     }
 
     @GetMapping("/{id}")
@@ -49,7 +51,7 @@ public class DocumentsController {
     public String viewDocument(@PathVariable("id") Long id, Model model) {
         Document document = documentService.findById(id);
         model.addAttribute("document", document);
-        return "document/view";
+        return "documents/view";
     }
 
     @GetMapping("/{id}/edit")
@@ -57,7 +59,7 @@ public class DocumentsController {
     public String editDocumentForm(@PathVariable("id") Long id, Model model) {
         Document document = documentService.findById(id);
         model.addAttribute("document", document);
-        return "document/edit";
+        return "documents/edit";
     }
 
     @PostMapping("/{id}/edit")
@@ -65,17 +67,17 @@ public class DocumentsController {
     public String editDocument(@Valid Document document, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors())
-            return "document/edit";
+            return "documents/edit";
 
         documentService.saveDocument(document);
-        return "redirect:/document";
+        return "redirect:/documents";
     }
 
     @GetMapping("/{id}/delete")
     @PreAuthorize("hasAuthority('accounts:read')")
     public String deleteUser(@PathVariable("id") Long id) {
         documentService.deleteById(id);
-        return "redirect:/document";
+        return "redirect:/documents";
     }
 
     @GetMapping()
@@ -121,7 +123,7 @@ public class DocumentsController {
             model.addAttribute("pageNumbers", pageNumbers);
         }
 
-        return "document/document";
+        return "documents/documents";
 
     }
 
@@ -168,7 +170,7 @@ public class DocumentsController {
             model.addAttribute("pageNumbers", pageNumbers);
         }
 
-        return "document/deleted";
+        return "documents/deleted";
 
     }
 }

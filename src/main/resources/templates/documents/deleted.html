@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Documents</title>
+    <title>Deleted Documents</title>
 
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
@@ -16,19 +16,18 @@
     <button type="submit">Logout</button>
 </form>
 <br/>
-<div class="container my-2" th:switch="${allDocs}">
+<div class="container my-2" th:switch="${deletedDocs}">
     <h2 th:case="null">No docs found!</h2>
     <div th:case="*">
-        <h2>Documents</h2>
-        <p><a href="/document/new" class="btn btn-primary btn-sm mb-3">Create document</a></p>
+        <h2>Deleted Documents</h2>
         <div class="row col-sm-10">
-            <form action="#" th:action="@{'/document?size=' + ${allDocs.size} +
+            <form action="#" th:action="@{'/documents/deleted?size=' + ${deletedDocs.size} +
                     '&page=1&sort=documentName&sortDir=' + ${reverseSortDir} +
                     '&keyword=' + ${searchValue}}" th:object="${value}" method="get">
                 <input type="text" id="txtSearch" name="keyword" placeholder="Search">
                 <button type="submit" value="Search">GO</button>
             </form>&nbsp;
-            <form action="#" th:action="@{'/document?size=' + ${allDocs.size} +
+            <form action="#" th:action="@{'/documents/deleted?size=' + ${deletedDocs.size} +
                     '&page=1&sort=documentName&sortDir=' + ${reverseSortDir} +
                     '&keyword=' + ${searchValue}}" th:object="${value}" method="get">
                 <button type="submit" value="Search">Clear</button>
@@ -38,49 +37,52 @@
             <thead>
             <tr>
                 <th>
-                    <a th:href="@{'/document?size=' + ${allDocs.size} +
+                    <a th:href="@{'/documents/deleted?size=' + ${deletedDocs.size} +
                     '&page=1&sort=documentId&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
                         ID</a></th>
                 <th>
-                    <a th:href="@{'/document/?size=' + ${allDocs.size} +
+                    <a th:href="@{'/documents/deleted?size=' + ${deletedDocs.size} +
                     '&page=1&sort=documentName&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
                         Document Name</a></th>
                 <th>
-                    <a th:href="@{'/document/?size=' + ${allDocs.size} +
+                    <a th:href="@{'/documents/deleted?size=' + ${deletedDocs.size} +
                     '&page=1&sort=createdAt&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
                         Created At</a></th>
                 <th>
-                    <a th:href="@{'/document?size=' + ${allDocs.size} +
+                    <a th:href="@{'/documents/deleted?size=' + ${deletedDocs.size} +
                     '&page=1&sort=supplier&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
                         Supplier</a></th>
                 <th>
-                    <a th:href="@{'/document?size=' + ${allDocs.size} +
+                    <a th:href="@{'/documents/deleted?size=' + ${deletedDocs.size} +
                     '&page=1&sort=consumer&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
                         Consumer</a></th>
                 <th>
-                    <a th:href="@{'/document?size=' + ${allDocs.size} +
+                    <a th:href="@{'/documents/deleted?size=' + ${deletedDocs.size} +
                     '&page=1&sort=contractTerm&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
                         Contract Term</a></th>
+                <th>Status</th>
+                <th>Description</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="document : ${allDocs}">
+            <tr th:each="document : ${deletedDocs}">
                 <td th:text="${document.documentId}"></td>
                 <td th:text="${document.documentName}"></td>
                 <td th:text="${document.createdAt}"></td>
                 <td th:text="${document.supplier}"></td>
                 <td th:text="${document.consumer}"></td>
                 <td th:text="${document.contractTerm}"></td>
-                <td><a th:href="@{/document/{id}(id=${document.documentId})}" class="btn btn-primary">View</a></td>
+                <td th:text="${document.docStatus}"></td>
+                <td th:text="${document.description}"></td>
             </tr>
             </tbody>
         </table>
 
-        <div th:if="${allDocs.totalPages > 0}">
+        <div th:if="${deletedDocs.totalPages > 0}">
             <div class="row col-sm-10">
                 <div>
 					<span th:each="pageNumber : ${pageNumbers}">
-						<a th:href="@{'/document/?size=' + ${allDocs.size} +
+						<a th:href="@{'/documents/deleted?size=' + ${deletedDocs.size} +
 						'&page=' + ${pageNumber} + '&sort=' + ${sortField} +
 						'&sortDir=' + ${sortDir} + '&keyword=' + ${searchValue}}"
                            th:text=${pageNumber}></a>
@@ -91,9 +93,8 @@
         </div>
 
     </div>
-
+    <p><a href="/admin">Admin panel</a></p>
 </div>
-<br/>
 
 </body>
 </html>
