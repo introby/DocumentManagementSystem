@@ -1,5 +1,5 @@
 package by.intro.dms.model;
 
-public enum Currency {
+public enum CurrencyEnum {
     USD, EUR, BYN
 }

@@ -1,13 +1,13 @@
 package by.intro.dms.repository;
 
 import by.intro.dms.model.*;
-import by.intro.dms.model.Currency;
+import by.intro.dms.model.CurrencyEnum;
 import by.intro.dms.service.CurrencyService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -15,9 +15,12 @@ import java.util.*;
 public class DocumentSpecificationRepository {
 
     private final DocumentRepository documentRepository;
+    private final CurrencyService currencyService;
 
-    public DocumentSpecificationRepository(DocumentRepository documentRepository, CurrencyService currencyService) {
+    public DocumentSpecificationRepository(DocumentRepository documentRepository,
+                                           @Qualifier("feignCurrencyServiceImpl") CurrencyService currencyService) {
         this.documentRepository = documentRepository;
+        this.currencyService = currencyService;
     }
 
     public Page<Document> findAllWithSpecification(DocumentRequest documentRequest) {
@@ -44,32 +47,17 @@ public class DocumentSpecificationRepository {
             specificationList.add(docStatusMultiselect(documentSearchCriteria.getDocStatus()));
         }
 
-        Currency currency = documentSearchCriteria.getCurrency();
+        CurrencyEnum currencyEnum = documentSearchCriteria.getCurrencyEnum();
 
-        if (Objects.nonNull(currency) && !"EUR".equals(currency.name())) {
-            Map<String, Float> rates = new HashMap<>();
+        if (Objects.nonNull(currencyEnum) && !currencyEnum.equals(CurrencyEnum.EUR)) {
             Page<Document> pageList = documentRepository.findAll(
-                    Specification.where(specificationList.stream().reduce((Specification::and)).get()), pageable);
-            try {
-                rates = CurrencyService.getRates();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                    Specification.where(specificationList.stream().reduce((Specification::and)).get()),
+                    pageable);
 
-            float eurToByn = rates.get("EUR") / rates.get("BYN");
-            float eurToUsd = rates.get("EUR") / rates.get("USD");
-
-            if ("BYN".equals(currency.name())) {
-                pageList.stream().forEach(document -> {
-                    document.setPrice(document.getPrice() * eurToByn);
-                    document.setCurrency(Currency.BYN);
-                });
-            } else {
-                pageList.stream().forEach(document -> {
-                    document.setPrice(document.getPrice() * eurToUsd);
-                    document.setCurrency(Currency.USD);
-                });
-            }
+            pageList.stream().forEach(document -> {
+                document.setPrice(document.getPrice() * currencyService.convertCurrency(currencyEnum));
+                document.setCurrencyEnum(currencyEnum);
+            });
 
             return pageList;
         }
@@ -82,8 +70,10 @@ public class DocumentSpecificationRepository {
 
     private Specification<Document> documentNameLike(String documentName) {
 
+        String docName = String.format("%%%s%%", documentName);
+
         return (root, query, criteriaBuilder) ->
-                criteriaBuilder.like(root.get(Document_.DOCUMENT_NAME), "%" + documentName + "%");
+                criteriaBuilder.like(root.get(Document_.DOCUMENT_NAME), docName);
     }
 
     private Specification<Document> consumerEqual(String consumer) {

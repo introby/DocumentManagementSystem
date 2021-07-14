@@ -48,7 +48,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         if(roles.contains("accounts:write")) {
             url = "/admin";
         } else if (roles.contains("accounts:read")) {
-            url = "/documents?size=5&page=1&sort=documentId&sortDir=ASC";
+            url = "/api/v1/documents?size=5&page=1&sort=documentId&sortDir=ASC";
         }
         return url;
     }

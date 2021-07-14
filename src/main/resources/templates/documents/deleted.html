@@ -21,13 +21,13 @@
     <div th:case="*">
         <h2>Deleted Documents</h2>
         <div class="row col-sm-10">
-            <form action="#" th:action="@{'/documents/deleted?size=' + ${deletedDocs.size} +
+            <form action="#" th:action="@{'/api/v1/documents/deleted?size=' + ${deletedDocs.size} +
                     '&page=1&sort=documentName&sortDir=' + ${reverseSortDir} +
                     '&keyword=' + ${searchValue}}" th:object="${value}" method="get">
                 <input type="text" id="txtSearch" name="keyword" placeholder="Search">
                 <button type="submit" value="Search">GO</button>
             </form>&nbsp;
-            <form action="#" th:action="@{'/documents/deleted?size=' + ${deletedDocs.size} +
+            <form action="#" th:action="@{'/api/v1/documents/deleted?size=' + ${deletedDocs.size} +
                     '&page=1&sort=documentName&sortDir=' + ${reverseSortDir} +
                     '&keyword=' + ${searchValue}}" th:object="${value}" method="get">
                 <button type="submit" value="Search">Clear</button>
@@ -37,27 +37,27 @@
             <thead>
             <tr>
                 <th>
-                    <a th:href="@{'/documents/deleted?size=' + ${deletedDocs.size} +
+                    <a th:href="@{'/api/v1/documents/deleted?size=' + ${deletedDocs.size} +
                     '&page=1&sort=documentId&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
                         ID</a></th>
                 <th>
-                    <a th:href="@{'/documents/deleted?size=' + ${deletedDocs.size} +
+                    <a th:href="@{'/api/v1/documents/deleted?size=' + ${deletedDocs.size} +
                     '&page=1&sort=documentName&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
                         Document Name</a></th>
                 <th>
-                    <a th:href="@{'/documents/deleted?size=' + ${deletedDocs.size} +
+                    <a th:href="@{'/api/v1/documents/deleted?size=' + ${deletedDocs.size} +
                     '&page=1&sort=createdAt&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
                         Created At</a></th>
                 <th>
-                    <a th:href="@{'/documents/deleted?size=' + ${deletedDocs.size} +
+                    <a th:href="@{'/api/v1/documents/deleted?size=' + ${deletedDocs.size} +
                     '&page=1&sort=supplier&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
                         Supplier</a></th>
                 <th>
-                    <a th:href="@{'/documents/deleted?size=' + ${deletedDocs.size} +
+                    <a th:href="@{'/api/v1/documents/deleted?size=' + ${deletedDocs.size} +
                     '&page=1&sort=consumer&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
                         Consumer</a></th>
                 <th>
-                    <a th:href="@{'/documents/deleted?size=' + ${deletedDocs.size} +
+                    <a th:href="@{'/api/v1/documents/deleted?size=' + ${deletedDocs.size} +
                     '&page=1&sort=contractTerm&sortDir=' + ${reverseSortDir} + '&keyword=' + ${searchValue}}">
                         Contract Term</a></th>
                 <th>Status</th>
@@ -82,7 +82,7 @@
             <div class="row col-sm-10">
                 <div>
 					<span th:each="pageNumber : ${pageNumbers}">
-						<a th:href="@{'/documents/deleted?size=' + ${deletedDocs.size} +
+						<a th:href="@{'/api/v1/documents/deleted?size=' + ${deletedDocs.size} +
 						'&page=' + ${pageNumber} + '&sort=' + ${sortField} +
 						'&sortDir=' + ${sortDir} + '&keyword=' + ${searchValue}}"
                            th:text=${pageNumber}></a>

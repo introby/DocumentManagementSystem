@@ -11,7 +11,7 @@
 
 </head>
 <body>
-<form action="#" th:action="@{/documents/new}" th:object="${document}" method="post">
+<form action="#" th:action="@{/api/v1/documents/new}" th:object="${document}" method="post">
     <label for="documentName">Document Name</label>
     <input type="text" th:field="*{documentName}" id="documentName" placeholder="Document Name">
     <div style="color:red" th:if="${#fields.hasErrors('documentName')}" th:errors="*{documentName}">Error</div>
@@ -37,6 +37,6 @@
 
     <input type="submit" value="Create Document">
 </form>
-<p><a href="/documents">List of the documents</a></p>
+<p><a href="/api/v1/documents">List of the documents</a></p>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>New document</title>
+    <title>Edit document</title>
 
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
@@ -11,7 +11,7 @@
 
 </head>
 <body>
-<form action="#" th:action="@{/documents/new}" th:object="${document}" method="post">
+<form action="#" th:action="@{/api/v1/documents/new}" th:object="${document}" method="post">
     <label for="documentId">ID</label>
     <input readonly type="number" th:field="*{documentId}" id="documentId" placeholder="ID">
     <label for="documentName">Document Name</label>
@@ -45,6 +45,6 @@
     <input type="submit" value="Save Document">
 </form>
 
-<p><a href="/documents">List of the documents</a></p>
+<p><a href="/api/v1/documents">List of the documents</a></p>
 </body>
 </html>

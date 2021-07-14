@@ -80,12 +80,13 @@ public class DocumentCriteriaRepository {
         List<DocStatus> docStatus = documentSearchCriteria.getDocStatus();
 
         if (Objects.nonNull(docStatus)) {
-            predicates.add(docStatus
+
+            docStatus
                     .stream()
                     .map(ds -> criteriaBuilder.equal(documentRoot.get(DOC_STATUS), ds))
                     .reduce(criteriaBuilder::or)
-                    .get()
-            );
+                    .map(predicates::add)
+                    .get();
         }
 
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

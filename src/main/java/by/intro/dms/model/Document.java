@@ -58,13 +58,13 @@ public class Document {
     @Column(name = "price")
     private Float price = 0.0f;
     @Transient
-    private Currency currency = Currency.EUR;
+    private CurrencyEnum currencyEnum = CurrencyEnum.EUR;
     @Column(name = "deleted")
     private boolean deleted = Boolean.FALSE;
 
 
     public Document(String documentName, LocalDate createdAt, String supplier, String consumer,
-                    LocalDate contractTerm, DocStatus docStatus, String description, Float price, Currency currency) {
+                    LocalDate contractTerm, DocStatus docStatus, String description, Float price, CurrencyEnum currencyEnum) {
         this.documentName = documentName;
         this.createdAt = createdAt;
         this.supplier = supplier;
@@ -73,7 +73,7 @@ public class Document {
         this.docStatus = docStatus;
         this.description = description;
         this.price = price;
-        this.currency = currency;
+        this.currencyEnum = currencyEnum;
     }
 
     public Document() {

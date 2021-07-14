@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Controller
-@RequestMapping("/documents")
+@RequestMapping("/api/v1/documents")
 public class DocumentsController {
 
     private final DocumentService documentService;
@@ -43,7 +43,7 @@ public class DocumentsController {
 
         document.setCreatedAt(LocalDate.now());
         documentService.saveDocument(document);
-        return "redirect:/documents";
+        return "redirect:/api/v1/documents";
     }
 
     @GetMapping("/{id}")
@@ -70,14 +70,14 @@ public class DocumentsController {
             return "documents/edit";
 
         documentService.saveDocument(document);
-        return "redirect:/documents";
+        return "redirect:/api/v1/documents";
     }
 
     @GetMapping("/{id}/delete")
     @PreAuthorize("hasAuthority('accounts:read')")
     public String deleteUser(@PathVariable("id") Long id) {
         documentService.deleteById(id);
-        return "redirect:/documents";
+        return "redirect:/api/v1/documents";
     }
 
     @GetMapping()

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/cr-search")
+@RequestMapping("/api/v1/cr-search")
 public class DocumentCriteriaSearchController {
 
     private final DocumentService documentService;
