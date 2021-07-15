@@ -1,13 +1,14 @@
 package by.intro.dms.service.feign;
 
-import by.intro.dms.model.feign.GeneralInfo;
-import feign.RequestLine;
-import org.springframework.stereotype.Component;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 
-@Component
+import java.util.Map;
+
+@FeignClient(name = "CR", url = "https://www.cbr-xml-daily.ru/daily_json.js")
 public interface CurrencyRateClient {
 
-    @RequestLine("GET")
-    GeneralInfo findAll();
+    @GetMapping
+    Map<?, ?> findAll();
 
 }

@@ -1,10 +1,10 @@
 package by.intro.dms.service;
 
 import by.intro.dms.model.CurrencyEnum;
-import by.intro.dms.model.feign.Currency;
-import by.intro.dms.model.feign.GeneralInfo;
+import by.intro.dms.model.Currency;
 import by.intro.dms.service.feign.CurrencyRateClient;
-import by.intro.dms.service.feign.CurrencyRateClientBuilder;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -15,19 +15,24 @@ public class FeignCurrencyServiceImpl implements CurrencyService {
 
     private final CurrencyRateClient currencyRateClient;
 
-    public FeignCurrencyServiceImpl(CurrencyRateClientBuilder currencyRateClientBuilder) {
-        this.currencyRateClient = currencyRateClientBuilder.currencyRateClient;
+    public FeignCurrencyServiceImpl(CurrencyRateClient currencyRateClient) {
+        this.currencyRateClient = currencyRateClient;
     }
 
     @Override
     public Map<String, Currency> getRates() {
         Map<String, Currency> map = new HashMap<>();
-        GeneralInfo generalInfo = currencyRateClient.findAll();
-        Currency byn = generalInfo.getValute().getByn();
+        Map<?, ?> generalInfo = currencyRateClient.findAll();
+        Map<String, Map<?, ?>> valute = (Map<String, Map<?, ?>>) generalInfo.get("Valute");
+
+        final ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false);
+        final Currency usd = mapper.convertValue(valute.get("USD"), Currency.class);
+        final Currency byn = mapper.convertValue(valute.get("BYN"), Currency.class);
+        final Currency eur = mapper.convertValue(valute.get("EUR"), Currency.class);
+
         map.put("BYN", byn);
-        Currency usd = generalInfo.getValute().getUsd();
         map.put("USD", usd);
-        Currency eur = generalInfo.getValute().getEur();
         map.put("EUR", eur);
 
         return map;

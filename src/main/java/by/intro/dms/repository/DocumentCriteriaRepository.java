@@ -85,8 +85,7 @@ public class DocumentCriteriaRepository {
                     .stream()
                     .map(ds -> criteriaBuilder.equal(documentRoot.get(DOC_STATUS), ds))
                     .reduce(criteriaBuilder::or)
-                    .map(predicates::add)
-                    .get();
+                    .ifPresent(predicates::add);
         }
 
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

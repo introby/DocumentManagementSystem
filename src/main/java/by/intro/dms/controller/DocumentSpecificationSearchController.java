@@ -1,30 +1,27 @@
 package by.intro.dms.controller;
 
-import by.intro.dms.model.Document;
 import by.intro.dms.model.DocumentRequest;
-import by.intro.dms.repository.DocumentSpecificationRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import by.intro.dms.model.response.DocumentsListResponse;
+import by.intro.dms.service.DocumentService;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/search")
+@RequestMapping(value = "/api/v1/search", produces = MediaType.APPLICATION_JSON_VALUE)
 public class DocumentSpecificationSearchController {
 
-    private final DocumentSpecificationRepository documentSpecificationRepository;
+    private final DocumentService documentService;
 
-    public DocumentSpecificationSearchController(DocumentSpecificationRepository documentSpecificationRepository) {
-        this.documentSpecificationRepository = documentSpecificationRepository;
+    public DocumentSpecificationSearchController(DocumentService documentService) {
+        this.documentService = documentService;
     }
 
     @PostMapping
-    public ResponseEntity<Page<Document>> getDocuments(@RequestBody DocumentRequest documentRequest) {
-        return new ResponseEntity<>(documentSpecificationRepository.findAllWithSpecification(
-                documentRequest),
-                HttpStatus.OK);
+    public DocumentsListResponse getDocuments(@RequestBody DocumentRequest documentRequest) {
+
+        return documentService.getDocumentsSpecification(documentRequest);
     }
 }

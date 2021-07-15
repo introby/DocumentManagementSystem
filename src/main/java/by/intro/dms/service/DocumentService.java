@@ -1,12 +1,14 @@
 package by.intro.dms.service;
 
+import by.intro.dms.mapper.DocumentMapper;
 import by.intro.dms.model.Document;
 import by.intro.dms.model.DocumentRequest;
+import by.intro.dms.model.response.DocumentsListResponse;
 import by.intro.dms.repository.DocumentCriteriaRepository;
 import by.intro.dms.repository.DocumentRepository;
+import by.intro.dms.repository.DocumentSpecificationRepository;
 import org.hibernate.Filter;
 import org.hibernate.Session;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -14,19 +16,27 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import java.util.Optional;
 
+import static by.intro.dms.service.PaginationUtils.buildPaginationInfo;
+
 @Service
 public class DocumentService {
 
-    @Autowired
-    private DocumentRepository documentRepository;
+    private final DocumentRepository documentRepository;
+    private final EntityManager entityManager;
+    private final DocumentCriteriaRepository documentCriteriaRepository;
+    private final DocumentSpecificationRepository documentSpecificationRepository;
+    private final DocumentMapper documentMapper;
 
-    @Autowired
-    private EntityManager entityManager;
-
-    @Autowired
-    private DocumentCriteriaRepository documentCriteriaRepository;
-
-    public DocumentService() {
+    public DocumentService(DocumentRepository documentRepository,
+                           EntityManager entityManager,
+                           DocumentCriteriaRepository documentCriteriaRepository,
+                           DocumentSpecificationRepository documentSpecificationRepository,
+                           DocumentMapper documentMapper) {
+        this.documentRepository = documentRepository;
+        this.entityManager = entityManager;
+        this.documentCriteriaRepository = documentCriteriaRepository;
+        this.documentSpecificationRepository = documentSpecificationRepository;
+        this.documentMapper = documentMapper;
     }
 
     public Page<Document> findByKeyword(boolean isDeleted, String findValue, PageRequest pageRequest) {
@@ -51,9 +61,29 @@ public class DocumentService {
         documentRepository.deleteById(documentId);
     }
 
-    public Page<Document> getDocuments(DocumentRequest documentRequest) {
+    public Page<Document> getDocumentsPageCriteria(DocumentRequest documentRequest) {
         return documentCriteriaRepository.findAllWithFilters(documentRequest.getDocumentPage(),
                 documentRequest.getDocumentSearchCriteria());
+    }
+
+    public DocumentsListResponse getDocumentsCriteria(DocumentRequest documentRequest) {
+        Page<Document> documentsPage = getDocumentsPageCriteria(documentRequest);
+        return DocumentsListResponse.builder()
+                .documents(documentMapper.documentListToDocumentDtoList(documentsPage.toList()))
+                .paginationInfo(buildPaginationInfo(documentsPage))
+                .build();
+    }
+
+    public Page<Document> getDocumentsPageSpecification(DocumentRequest documentRequest) {
+        return documentSpecificationRepository.findAllWithSpecification(documentRequest);
+    }
+
+    public DocumentsListResponse getDocumentsSpecification(DocumentRequest documentRequest) {
+        Page<Document> documentsPage = getDocumentsPageSpecification(documentRequest);
+        return DocumentsListResponse.builder()
+                .documents(documentMapper.documentListToDocumentDtoList(documentsPage.toList()))
+                .paginationInfo(buildPaginationInfo(documentsPage))
+                .build();
     }
 
 }

@@ -1,7 +1,7 @@
 package by.intro.dms.service;
 
 import by.intro.dms.model.CurrencyEnum;
-import by.intro.dms.model.feign.Currency;
+import by.intro.dms.model.Currency;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
