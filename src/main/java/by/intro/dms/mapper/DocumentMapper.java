@@ -10,8 +10,6 @@ import java.util.List;
 public interface DocumentMapper {
 
     DocumentDto documentToDocumentDto(Document document);
-    Document documentDtoToDocument(DocumentDto dto);
 
-    List<DocumentDto> documentListToDocumentDtoList(List<Document> documentList);
-    List<Document> documentDtoListToDocumentList(List<DocumentDto> documentDtoList);
+    List<DocumentDto> toDtoList(List<Document> documentList);
 }

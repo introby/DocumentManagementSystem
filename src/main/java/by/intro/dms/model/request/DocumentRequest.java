@@ -1,5 +1,7 @@
-package by.intro.dms.model;
+package by.intro.dms.model.request;
 
+import by.intro.dms.model.DocumentPage;
+import by.intro.dms.model.DocumentSearchCriteria;
 import lombok.Data;
 
 @Data

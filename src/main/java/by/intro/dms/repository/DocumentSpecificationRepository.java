@@ -2,6 +2,7 @@ package by.intro.dms.repository;
 
 import by.intro.dms.model.*;
 import by.intro.dms.model.CurrencyEnum;
+import by.intro.dms.model.request.DocumentRequest;
 import by.intro.dms.service.CurrencyService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.*;
@@ -49,7 +50,7 @@ public class DocumentSpecificationRepository {
 
         CurrencyEnum currencyEnum = documentSearchCriteria.getCurrencyEnum();
 
-        if (Objects.nonNull(currencyEnum) && !currencyEnum.equals(CurrencyEnum.EUR)) {
+        if (Objects.nonNull(currencyEnum) && currencyEnum != CurrencyEnum.EUR) {
             Page<Document> pageList = documentRepository.findAll(
                     Specification.where(specificationList.stream().reduce((Specification::and)).get()),
                     pageable);

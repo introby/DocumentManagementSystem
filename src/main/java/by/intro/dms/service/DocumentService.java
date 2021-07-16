@@ -2,7 +2,7 @@ package by.intro.dms.service;
 
 import by.intro.dms.mapper.DocumentMapper;
 import by.intro.dms.model.Document;
-import by.intro.dms.model.DocumentRequest;
+import by.intro.dms.model.request.DocumentRequest;
 import by.intro.dms.model.response.DocumentsListResponse;
 import by.intro.dms.repository.DocumentCriteriaRepository;
 import by.intro.dms.repository.DocumentRepository;
@@ -69,7 +69,7 @@ public class DocumentService {
     public DocumentsListResponse getDocumentsCriteria(DocumentRequest documentRequest) {
         Page<Document> documentsPage = getDocumentsPageCriteria(documentRequest);
         return DocumentsListResponse.builder()
-                .documents(documentMapper.documentListToDocumentDtoList(documentsPage.toList()))
+                .documents(documentMapper.toDtoList(documentsPage.toList()))
                 .paginationInfo(buildPaginationInfo(documentsPage))
                 .build();
     }
@@ -81,8 +81,9 @@ public class DocumentService {
     public DocumentsListResponse getDocumentsSpecification(DocumentRequest documentRequest) {
         Page<Document> documentsPage = getDocumentsPageSpecification(documentRequest);
         return DocumentsListResponse.builder()
-                .documents(documentMapper.documentListToDocumentDtoList(documentsPage.toList()))
+                .documents(documentMapper.toDtoList(documentsPage.toList()))
                 .paginationInfo(buildPaginationInfo(documentsPage))
+                .currency(documentRequest.getDocumentSearchCriteria().getCurrencyEnum().name())
                 .build();
     }
 

@@ -10,10 +10,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Currency {
 
+    private String id;
+    private int numCode;
     private String charCode;
     private int nominal;
     private String name;
     private float value;
+    private float previous;
+
+    @JsonProperty("ID")
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @JsonProperty("NumCode")
+    public void setNumCode(int numCode) {
+        this.numCode = numCode;
+    }
 
     @JsonProperty("CharCode")
     public void setCharCode(String charCode) {
@@ -33,5 +46,10 @@ public class Currency {
     @JsonProperty("Value")
     public void setValue(float value) {
         this.value = value;
+    }
+
+    @JsonProperty("Previous")
+    public void setPrevious(float previous) {
+        this.previous = previous;
     }
 }

@@ -1,6 +1,6 @@
 package by.intro.dms.controller;
 
-import by.intro.dms.model.DocumentRequest;
+import by.intro.dms.model.request.DocumentRequest;
 import by.intro.dms.model.response.DocumentsListResponse;
 import by.intro.dms.service.DocumentService;
 import org.springframework.http.MediaType;

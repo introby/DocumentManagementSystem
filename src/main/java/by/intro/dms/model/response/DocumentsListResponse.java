@@ -12,5 +12,7 @@ import java.util.List;
 public class DocumentsListResponse {
 
     private PaginationInfo paginationInfo;
+    private String currency;
     private List<DocumentDto> documents;
+
 }
