@@ -1,6 +1,6 @@
 package by.intro.dms.service.feign;
 
-import by.intro.dms.model.valute.GeneralInfo;
+import by.intro.dms.model.valute.CurrencyApiResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public interface CurrencyRateClient {
 
     @GetMapping
-    GeneralInfo findAll();
+    CurrencyApiResponse findAll();
 
 }

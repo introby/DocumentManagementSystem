@@ -4,7 +4,7 @@ import by.intro.dms.mapper.CurrencyMapper;
 import by.intro.dms.model.Currency;
 import by.intro.dms.model.CurrencyEnum;
 import by.intro.dms.model.dto.CurrencyDto;
-import by.intro.dms.model.valute.GeneralInfo;
+import by.intro.dms.model.valute.CurrencyApiResponse;
 import by.intro.dms.model.valute.Valutes;
 import by.intro.dms.service.CurrencyService;
 import by.intro.dms.service.feign.CurrencyRateClient;
@@ -27,8 +27,8 @@ public class FeignCurrencyServiceImpl implements CurrencyService {
     @Override
     public Map<String, Currency> getRates() {
 
-        GeneralInfo generalInfo = currencyRateClient.findAll();
-        Valutes valutes = generalInfo.getValutes();
+        CurrencyApiResponse currencyApiResponse = currencyRateClient.findAll();
+        Valutes valutes = currencyApiResponse.getValutes();
 
         return valutes.getProperties();
     }
