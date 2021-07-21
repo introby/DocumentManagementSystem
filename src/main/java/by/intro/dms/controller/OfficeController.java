@@ -1,10 +1,10 @@
 package by.intro.dms.controller;
 
+import by.intro.dms.model.office.ImportStatus;
 import by.intro.dms.model.office.OfficePage;
 import by.intro.dms.model.response.OfficesListResponse;
-import by.intro.dms.service.CsvService;
+import by.intro.dms.service.OfficeImportService;
 import by.intro.dms.service.office.OfficeService;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -29,14 +29,14 @@ import java.util.UUID;
 public class OfficeController {
 
     private static final String FILE_PATH =
-            String.format("src/main/resources/import/import_%s.csv", LocalDateTime.now());
+            String.format("%s/import/import_%s.csv", OfficeImportService.tmp, LocalDateTime.now());
 
     private final OfficeService officeService;
-    private final CsvService csvService;
+    private final OfficeImportService officeImportService;
 
-    public OfficeController(OfficeService officeService, CsvService csvService) {
+    public OfficeController(OfficeService officeService, OfficeImportService officeImportService) {
         this.officeService = officeService;
-        this.csvService = csvService;
+        this.officeImportService = officeImportService;
     }
 
     @GetMapping
@@ -57,8 +57,8 @@ public class OfficeController {
         UUID uuid = UUID.randomUUID();
 
         Runnable task = () -> {
-            List<Object> beans = csvService.getBeansFromCsv(FILE_PATH, uuid);
-            csvService.saveBeans(beans, uuid);
+            List<Object> beans = officeImportService.getBeansFromCsv(FILE_PATH, uuid);
+            officeImportService.saveBeans(beans, uuid);
         };
         Thread thread = new Thread(task);
         thread.start();
@@ -72,7 +72,7 @@ public class OfficeController {
         UUID uuid = UUID.randomUUID();
 
         Runnable task = () -> {
-            csvService.getCsv(uuid, officePage);
+            officeImportService.getCsv(uuid, officePage);
         };
         Thread thread = new Thread(task);
         thread.start();
@@ -82,9 +82,9 @@ public class OfficeController {
 
     @GetMapping("/export/{id}/file")
     public ResponseEntity<Object> getFile(@PathVariable("id") UUID uuid) throws FileNotFoundException {
-        String status = csvService.getStatus(uuid);
-        if (status.equals("success")) {
-            String filePath = csvService.getFilePath(uuid);
+        ImportStatus status = officeImportService.getStatus(uuid);
+        if (status == ImportStatus.SUCCESS) {
+            String filePath = officeImportService.getFilePath(uuid);
             File csv = new File(filePath);
             InputStreamResource resource = new InputStreamResource(new FileInputStream(csv));
             long length = csv.length();
@@ -99,18 +99,28 @@ public class OfficeController {
                         .body(resource);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    @GetMapping(value = "/import/{id}", produces = MediaType.TEXT_PLAIN_VALUE)
-    public String importStatus(@PathVariable("id") UUID uuid) {
-        return csvService.getStatus(uuid);
+    @GetMapping(value = "/import/{id}")
+    public ImportStatus importStatus(@PathVariable("id") UUID uuid) {
+        return officeImportService.getStatus(uuid);
     }
 
-    @GetMapping(value = "/export/{id}", produces = MediaType.TEXT_PLAIN_VALUE)
-    public String exportStatus(@PathVariable("id") UUID uuid) {
-        return csvService.getStatus(uuid);
+    @GetMapping(value = "/export/{id}")
+    public ResponseEntity<ImportStatus> exportStatus(@PathVariable("id") UUID uuid) {
+        ImportStatus status = officeImportService.getStatus(uuid);
+        if (status == ImportStatus.SUCCESS) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Location", String.format("%s/file", uuid));
+            return ResponseEntity
+                    .status(HttpStatus.SEE_OTHER)
+                    .headers(headers)
+                    .build();
+        }
+
+        return ResponseEntity.ok().body(status);
     }
 }

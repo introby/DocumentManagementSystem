@@ -1,46 +1,59 @@
 package by.intro.dms.service;
 
-import by.intro.dms.model.office.Contact;
-import by.intro.dms.model.office.ContactType;
-import by.intro.dms.model.office.Office;
-import by.intro.dms.model.office.OfficePage;
+import by.intro.dms.model.office.*;
 import by.intro.dms.model.response.OfficesListResponse;
 import by.intro.dms.repository.office.ContactRepository;
 import by.intro.dms.repository.office.OfficeRepository;
 import by.intro.dms.service.office.OfficeService;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class CsvService {
+public class OfficeImportService {
 
-    private Map<UUID, String> status = new HashMap<>();
+    public static Path tmp;
+    static {
+        try {
+            tmp = Files.createTempDirectory("dms_");
+            new File(tmp + "/import").mkdirs();
+            new File(tmp + "/export").mkdirs();
+        } catch (IOException e) {
+            throw new RuntimeException("Temp directory not created", e);
+        }
+    }
+
+    private Map<UUID, ImportStatus> status = new HashMap<>();
     private Map<UUID, String> outputCsvPath = new HashMap<>();
 
     private static final String EXPORT_FILE_PATH =
-            String.format("src/main/resources/export/export_%s.csv", LocalDateTime.now());
+            String.format("%s/export/export_%s.csv", tmp, LocalDateTime.now());
 
     private final OfficeRepository officeRepository;
     private final ContactRepository contactRepository;
     private final OfficeService officeService;
 
-    public CsvService(OfficeRepository officeRepository,
-                      ContactRepository contactRepository,
-                      OfficeService officeService) {
+    public OfficeImportService(OfficeRepository officeRepository,
+                               ContactRepository contactRepository,
+                               OfficeService officeService) {
         this.officeRepository = officeRepository;
         this.contactRepository = contactRepository;
         this.officeService = officeService;
     }
 
-    public List<List<String>> parseCsv(String csvFile) {
+    public List<List<String>> parseCsv(String csvFile, UUID uuid) {
         List<List<String>> records = new ArrayList<>();
         try (CSVReader csvReader = new CSVReader(new FileReader(csvFile))) {
             String[] values = null;
@@ -48,16 +61,17 @@ public class CsvService {
                 records.add(Arrays.asList(values));
             }
         } catch (IOException | CsvValidationException e) {
+            status.put(uuid, ImportStatus.FAILED);
             throw new RuntimeException(e);
         }
         return records;
     }
 
     public List<Object> getBeansFromCsv(String file, UUID uuid) {
-        status.put(uuid, "pending");
+        status.put(uuid, ImportStatus.PENDING);
         List<Office> offices = new ArrayList<>();
         List<Contact> contacts = new ArrayList<>();
-        List<List<String>> csv = parseCsv(file);
+        List<List<String>> csv = parseCsv(file, uuid);
         csv
                 .forEach(list -> {
                     Office office = new Office();
@@ -88,17 +102,18 @@ public class CsvService {
         return result;
     }
 
+    @Transactional
     public void saveBeans(List<Object> beans, UUID uuid) {
         List<Office> offices = (List<Office>) beans.get(0);
         List<Contact> contacts = (List<Contact>) beans.get(1);
 
         offices.forEach(officeRepository::save);
         contacts.forEach(contactRepository::save);
-        status.put(uuid, "success");
+        status.put(uuid, ImportStatus.SUCCESS);
     }
 
     public void getCsv(UUID uuid, OfficePage officePage) {
-        status.put(uuid, "pending");
+        status.put(uuid, ImportStatus.PENDING);
         OfficesListResponse offices = officeService.getOffices(officePage);
 
         File csvOutputFile = new File(EXPORT_FILE_PATH);
@@ -120,15 +135,16 @@ public class CsvService {
                     ))
                     .forEach(pw::println);
         } catch (IOException e) {
+            status.put(uuid, ImportStatus.FAILED);
             throw new RuntimeException(e);
         }
 
         outputCsvPath.put(uuid, csvOutputFile.getPath());
-        status.put(uuid, "success");
+        status.put(uuid, ImportStatus.SUCCESS);
     }
 
-    public String getStatus(UUID uuid) {
-        return status.getOrDefault(uuid, "ID not found");
+    public ImportStatus getStatus(UUID uuid) {
+        return status.getOrDefault(uuid, ImportStatus.UNKNOWN);
     }
 
     public String getFilePath(UUID uuid) {
