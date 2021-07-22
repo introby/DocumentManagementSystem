@@ -1,3 +1,29 @@
 feign:
   client:
     url: https://www.cbr-xml-daily.ru/daily_json.js
+
+spring:
+  jpa:
+    show-sql: true
+  flyway:
+    baseline-on-migrate: true
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      username: admin
+      authentication-database: database
+      database: dms_mongo
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dms
+    username: postgres
+    password: postgres
+  main:
+      allow-bean-definition-overriding: true
+
+logging:
+  level:
+    org:
+      springframework:
+        jdbc:
+          core: TRACE

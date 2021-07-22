@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 public class OfficeImportService {
 
     public static Path tmp;
+
     static {
         try {
             tmp = Files.createTempDirectory("dms_");
@@ -72,29 +73,35 @@ public class OfficeImportService {
         List<Office> offices = new ArrayList<>();
         List<Contact> contacts = new ArrayList<>();
         List<List<String>> csv = parseCsv(file, uuid);
-        csv
-                .forEach(list -> {
-                    Office office = new Office();
-                    office.setName(list.get(0));
-                    office.setCity(list.get(1));
-                    office.setWorkingTimeFrom(LocalTime.parse(list.get(2)));
-                    office.setWorkingTimeTo(LocalTime.parse(list.get(3)));
-                    office.setMetadata(list.get(4));
-                    String contactsString = list.get(5);
-                    if (!contactsString.equals("")) {
-                        String[] contactsArray = contactsString.split(";");
-                        Arrays.stream(contactsArray).forEach(c -> {
-                            Contact contact = new Contact();
-                            String[] contactArray = c.split(":");
-                            contact.setType(ContactType.valueOf(contactArray[0].toUpperCase()));
-                            contact.setValue(contactArray[1]);
-                            contact.setOffice(office);
-                            contacts.add(contact);
-                        });
-                    }
 
-                    offices.add(office);
-                });
+        try {
+            csv
+                    .forEach(list -> {
+                        Office office = new Office();
+                        office.setName(list.get(0));
+                        office.setCity(list.get(1));
+                        office.setWorkingTimeFrom(LocalTime.parse(list.get(2)));
+                        office.setWorkingTimeTo(LocalTime.parse(list.get(3)));
+                        office.setMetadata(list.get(4));
+                        String contactsString = list.get(5);
+                        if (!contactsString.equals("")) {
+                            String[] contactsArray = contactsString.split(";");
+                            Arrays.stream(contactsArray).forEach(c -> {
+                                Contact contact = new Contact();
+                                String[] contactArray = c.split(":");
+                                contact.setType(ContactType.valueOf(contactArray[0].toUpperCase()));
+                                contact.setValue(contactArray[1]);
+                                contact.setOffice(office);
+                                contacts.add(contact);
+                            });
+                        }
+
+                        offices.add(office);
+                    });
+        } catch (Exception e) {
+            status.put(uuid, ImportStatus.FAILED);
+            throw new RuntimeException(e);
+        }
 
         List<Object> result = new ArrayList<>();
         result.add(offices);
@@ -107,9 +114,15 @@ public class OfficeImportService {
         List<Office> offices = (List<Office>) beans.get(0);
         List<Contact> contacts = (List<Contact>) beans.get(1);
 
-        offices.forEach(officeRepository::save);
-        contacts.forEach(contactRepository::save);
-        status.put(uuid, ImportStatus.SUCCESS);
+        try {
+            offices.forEach(officeRepository::save);
+            contacts.forEach(contactRepository::save);
+            status.put(uuid, ImportStatus.SUCCESS);
+        } catch (Exception e) {
+            status.put(uuid, ImportStatus.FAILED);
+            throw new RuntimeException(e);
+        }
+
     }
 
     public void getCsv(UUID uuid, OfficePage officePage) {
