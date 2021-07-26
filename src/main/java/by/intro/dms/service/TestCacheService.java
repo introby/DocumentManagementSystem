@@ -1,35 +1,31 @@
 package by.intro.dms.service;
 
 import by.intro.dms.model.TestItem;
-import by.intro.dms.repository.TestCacheRepository;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 public class TestCacheService {
 
-    private final TestCacheRepository testCacheRepository;
+    private final GenericCache<String, TestItem> cache;
 
-    public TestCacheService(TestCacheRepository testCacheRepository) {
-        this.testCacheRepository = testCacheRepository;
+    public TestCacheService(GenericCache cache) {
+        this.cache = cache;
     }
 
-    public TestItem add(TestItem testItem) {
-        return testCacheRepository.insert(testItem);
+    @Cacheable(cacheNames = "items")
+    public TestItem getSingleItem(String name) {
+        return this.cache.get(name).orElseGet(() -> getItemFromRemoteService(name));
     }
 
-    @Cacheable("items")
-    public TestItem findByName(String name) {
-        return testCacheRepository.findByName(name).orElseGet(this::getItemFromRemoteService);
-    }
-
-    public TestItem getItemFromRemoteService() {
-        String name = "name";
-        String content = "content from remote service";
+    public TestItem getItemFromRemoteService(String name) {
+        String content = String.format("%s_%s", name, LocalDateTime.now());
         TestItem testItem = new TestItem();
         testItem.setName(name);
         testItem.setContent(content);
-        add(testItem);
+        this.cache.put(name, testItem);
         return testItem;
     }
 }

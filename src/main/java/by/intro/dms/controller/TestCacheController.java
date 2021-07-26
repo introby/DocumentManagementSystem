@@ -22,7 +22,7 @@ public class TestCacheController {
 
     @GetMapping(value = "{name}")
     public ResponseEntity<TestItem> getItem(@PathVariable("name") String name) {
-        TestItem item = testCacheService.findByName(name);
+        TestItem item = testCacheService.getSingleItem(name);
         return new ResponseEntity<>(item, HttpStatus.OK);
     }
 }
