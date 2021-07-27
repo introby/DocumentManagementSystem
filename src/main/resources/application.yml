@@ -30,3 +30,8 @@ logging:
       springframework:
         jdbc:
           core: TRACE
+
+jwt:
+  header: Authorization
+  secret: secret
+  expiration: 604800
