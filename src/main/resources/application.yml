@@ -9,13 +9,13 @@ spring:
     baseline-on-migrate: true
   data:
     mongodb:
-      host: localhost
+      host: mongodb
       port: 27017
       username: admin
       authentication-database: database
       database: dms_mongo
   datasource:
-    url: jdbc:postgresql://localhost:5432/dms
+    url: jdbc:postgresql://db:5432/dms
     username: postgres
     password: postgres
   main:

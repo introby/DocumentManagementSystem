@@ -1,0 +1,26 @@
+version: '3.7'
+services:
+  app:
+    image: app
+    build:
+      context: .
+    container_name: app
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+      - mongodb
+  db:
+    image: postgres:13.3-alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=dms
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - 27017:27017
+    restart: unless-stopped
