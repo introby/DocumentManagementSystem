@@ -9,15 +9,17 @@ spring:
     baseline-on-migrate: true
   data:
     mongodb:
-      host: mongodb
-      port: 27017
-      username: admin
+      host: ${MONGO_HOST:localhost}
+      port: ${MONGO_PORT:27017}
+      username: ${MONGO_USERNAME:admin}
       authentication-database: database
-      database: dms_mongo
+      database: ${MONGO_DB:dms_mongo}
   datasource:
-    url: jdbc:postgresql://db:5432/dms
-    username: postgres
-    password: postgres
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:dms}
+    username: ${POSTGRES_USERNAME:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    name: ${POSTGRES_DB:dms}
   main:
       allow-bean-definition-overriding: true
 
