@@ -20,4 +20,6 @@ public interface DocumentRepository extends JpaRepository<Document, Long>,
             "OR cast(d.documentId AS text) LIKE %?1%")
     Page<Document> findByKeyword(String findValue, PageRequest pageRequest);
 
+    Document findDocumentBySupplier(String supplier);
+
 }

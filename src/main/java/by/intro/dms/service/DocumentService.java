@@ -53,6 +53,10 @@ public class DocumentService {
         return dop.get();
     }
 
+    public Document findBySupplier(String supplier) {
+        return documentRepository.findDocumentBySupplier(supplier);
+    }
+
     public Document saveDocument(Document document) {
         return documentRepository.save(document);
     }
