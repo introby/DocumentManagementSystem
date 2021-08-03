@@ -40,6 +40,7 @@ public class AuthenticationRestControllerV1 {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequestDto request) {
+        Map<Object, Object> response = new ConcurrentHashMap<>();
         try {
             String login = request.getUsername();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(),
@@ -47,12 +48,13 @@ public class AuthenticationRestControllerV1 {
             UserAccount user = userAccountRepository.findByUsername(login)
                     .orElseThrow(() -> new UsernameNotFoundException("User doesn't exists"));
             String token = jwtTokenProvider.createToken(request.getUsername(), user.getRole().name());
-            Map<Object, Object> response = new ConcurrentHashMap<>();
             response.put("username", request.getUsername());
             response.put("token", token);
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
-            return new ResponseEntity<>("Invalid username/password combination", HttpStatus.FORBIDDEN);
+            response.put("username", request.getUsername());
+            response.put("token", "Invalid username/password combination");
+            return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
         }
     }
 

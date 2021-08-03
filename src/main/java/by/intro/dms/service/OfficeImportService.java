@@ -29,8 +29,8 @@ public class OfficeImportService {
     static {
         try {
             tmp = Files.createTempDirectory("dms_");
-            new File(tmp + "/import").mkdirs();
-            new File(tmp + "/export").mkdirs();
+            new File(tmp + File.separator + "import").mkdirs();
+            new File(tmp + File.separator + "export").mkdirs();
         } catch (IOException e) {
             throw new RuntimeException("Temp directory not created", e);
         }
@@ -40,7 +40,12 @@ public class OfficeImportService {
     private Map<UUID, String> outputCsvPath = new HashMap<>();
 
     private static final String EXPORT_FILE_PATH =
-            String.format("%s/export/export_%s.csv", tmp, LocalDateTime.now());
+            String.format("%s%sexport%sexport_%s.csv",
+                    tmp,
+                    File.separator,
+                    File.separator,
+                    LocalDateTime.now()
+            );
 
     private final OfficeRepository officeRepository;
     private final ContactRepository contactRepository;

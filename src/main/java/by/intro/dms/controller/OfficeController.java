@@ -46,7 +46,7 @@ public class OfficeController {
     }
 
     @GetMapping("/import")
-    public UUID importFromCsv(String file) {
+    public ResponseEntity<Object> importFromCsv(String file) {
         File csvFile = new File(FILE_PATH);
         try {
             Files.copy(new File(file).toPath(), csvFile.toPath());
@@ -63,11 +63,14 @@ public class OfficeController {
         Thread thread = new Thread(task);
         thread.start();
 
-        return uuid;
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("UUID", String.format("%s", uuid));
+
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
     @GetMapping("/export")
-    public UUID exportToCsv(OfficePage officePage) {
+    public ResponseEntity<Object> exportToCsv(OfficePage officePage) {
 
         UUID uuid = UUID.randomUUID();
 
@@ -77,7 +80,10 @@ public class OfficeController {
         Thread thread = new Thread(task);
         thread.start();
 
-        return uuid;
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("UUID", String.format("%s", uuid));
+
+        return ResponseEntity.ok().headers(headers).build();
     }
 
     @GetMapping("/export/{id}/file")
@@ -105,12 +111,17 @@ public class OfficeController {
     }
 
     @GetMapping(value = "/import/{id}")
-    public ImportStatus importStatus(@PathVariable("id") UUID uuid) {
-        return officeImportService.getStatus(uuid);
+    public ResponseEntity<Object> importStatus(@PathVariable("id") UUID uuid) {
+        ImportStatus importStatus = officeImportService.getStatus(uuid);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("status", String.format("%s", importStatus));
+
+        return ResponseEntity.ok().headers(headers).build();
     }
 
     @GetMapping(value = "/export/{id}")
-    public ResponseEntity<ImportStatus> exportStatus(@PathVariable("id") UUID uuid) {
+    public ResponseEntity<Object> exportStatus(@PathVariable("id") UUID uuid) {
         ImportStatus status = officeImportService.getStatus(uuid);
         if (status == ImportStatus.SUCCESS) {
             HttpHeaders headers = new HttpHeaders();
@@ -121,6 +132,9 @@ public class OfficeController {
                     .build();
         }
 
-        return ResponseEntity.ok().body(status);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("status", String.format("%s", status));
+
+        return ResponseEntity.ok().headers(headers).build();
     }
 }

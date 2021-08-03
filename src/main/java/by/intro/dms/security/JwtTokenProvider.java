@@ -1,14 +1,14 @@
 package by.intro.dms.security;
 
-import by.intro.dms.exception.JwtAuthenticationException;
+import by.intro.dms.exception.ApiRequestException;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +42,7 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds * 1000);
 
-        return Jwts.builder()
+        return "Bearer " + Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(validity)
@@ -50,12 +50,15 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    @ExceptionHandler(ApiRequestException.class)
     public boolean validateToken(String token) {
         try {
             Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return !claimsJws.getBody().getExpiration().before(new Date());
-        } catch (JwtException | IllegalArgumentException e) {
-            throw new JwtAuthenticationException("JWT token is expired or invalid", HttpStatus.UNAUTHORIZED);
+//        } catch (JwtException | IllegalArgumentException e) {
+        } catch (Exception e) {
+            throw new ApiRequestException("JWT token is expired or invalid");
+//            return false;
         }
     }
 
@@ -69,6 +72,10 @@ public class JwtTokenProvider {
     }
 
     public String resolveToken(HttpServletRequest request) {
-        return request.getHeader(header);
+        String token = request.getHeader(this.header);
+        if (token != null && token.contains("Bearer")) {
+            token = token.split(" ")[1];
+        }
+        return token;
     }
 }

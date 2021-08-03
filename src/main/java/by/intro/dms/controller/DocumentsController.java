@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@Controller
+@RestController
 @RequestMapping("/api/v1/documents")
 public class DocumentsController {
 

@@ -12,6 +12,7 @@ spring:
       host: ${MONGO_HOST:localhost}
       port: ${MONGO_PORT:27017}
       username: ${MONGO_USERNAME:admin}
+      password: ${MONGO_PASSWORD:admin}
       authentication-database: database
       database: ${MONGO_DB:dms_mongo}
   datasource:
@@ -21,7 +22,7 @@ spring:
     password: ${POSTGRES_PASSWORD:postgres}
     name: ${POSTGRES_DB:dms}
   main:
-      allow-bean-definition-overriding: true
+    allow-bean-definition-overriding: true
 
 app:
   cache-timeout: 300000
@@ -32,6 +33,8 @@ logging:
       springframework:
         jdbc:
           core: TRACE
+        web:
+          TRACE
 
 jwt:
   header: Authorization
