@@ -3,7 +3,6 @@ package by.intro.dms.service.office;
 import by.intro.dms.mapper.OfficeMapper;
 import by.intro.dms.model.office.Office;
 import by.intro.dms.model.office.OfficePage;
-import by.intro.dms.model.request.OfficeRequest;
 import by.intro.dms.model.response.OfficesListResponse;
 import by.intro.dms.repository.office.OfficeRepository;
 import org.springframework.data.domain.Page;
@@ -22,21 +21,6 @@ public class OfficeService {
         this.officeRepository = officeRepository;
         this.officeMapper = officeMapper;
     }
-
-//    public Page<Office> getOfficesPage(OfficeRequest officeRequest) {
-//        int pageNumber = officeRequest.getOfficePage().getPageNumber();
-//        int pageSize = officeRequest.getOfficePage().getPageSize();
-//        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
-//        return officeRepository.findAll(pageRequest);
-//    }
-//
-//    public OfficesListResponse getOffices(OfficeRequest officeRequest) {
-//        Page<Office> officesPage = getOfficesPage(officeRequest);
-//        return OfficesListResponse.builder()
-//                .offices(officeMapper.toDtoList(officesPage.toList()))
-//                .paginationInfo(buildPaginationInfo(officesPage))
-//                .build();
-//    }
 
     public Page<Office> getOfficesPage(OfficePage officePage) {
         int pageNumber = officePage.getPageNumber();

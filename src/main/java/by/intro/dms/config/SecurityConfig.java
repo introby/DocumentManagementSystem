@@ -1,5 +1,6 @@
 package by.intro.dms.config;
 
+import by.intro.dms.exception.AuthEntryPointJwt;
 import by.intro.dms.security.JwtConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,15 +19,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtConfigurer jwtConfigurer;
+    private final AuthEntryPointJwt authEntryPointJwt;
 
-    public SecurityConfig(JwtConfigurer jwtConfigurer) {
+    public SecurityConfig(JwtConfigurer jwtConfigurer, AuthEntryPointJwt authEntryPointJwt) {
         this.jwtConfigurer = jwtConfigurer;
+        this.authEntryPointJwt = authEntryPointJwt;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                .exceptionHandling().authenticationEntryPoint(authEntryPointJwt)
+                .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()

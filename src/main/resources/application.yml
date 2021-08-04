@@ -24,6 +24,9 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
+  mvc:
+    log-request-details: off
+
 app:
   cache-timeout: 300000
 
@@ -33,10 +36,34 @@ logging:
       springframework:
         jdbc:
           core: TRACE
-        web:
-          TRACE
-
+#        web:
+#          TRACE
+    org.zalando.logbook: TRACE
 jwt:
   header: Authorization
   secret: secret
   expiration: 604800
+
+logbook:
+  include:
+    - /api/**
+    - /actuator/**
+  exclude:
+    - /actuator/health
+    - /api/admin/**
+  filter.enabled: true
+  secure-filter.enabled: true
+  format.style: http
+  strategy: body-only-if-status-at-least
+  minimum-status: 400
+  obfuscate:
+    headers:
+      - Authorization
+      - X-Secret
+      - token
+    parameters:
+      - token
+      - password
+      - client_secret
+  write:
+    chunk-size: 1000

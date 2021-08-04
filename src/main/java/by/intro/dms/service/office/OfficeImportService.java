@@ -1,14 +1,14 @@
-package by.intro.dms.service;
+package by.intro.dms.service.office;
 
 import by.intro.dms.model.office.*;
 import by.intro.dms.model.response.OfficesListResponse;
 import by.intro.dms.repository.office.ContactRepository;
 import by.intro.dms.repository.office.OfficeRepository;
-import by.intro.dms.service.office.OfficeService;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileReader;
@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
@@ -39,6 +40,8 @@ public class OfficeImportService {
     private Map<UUID, ImportStatus> status = new HashMap<>();
     private Map<UUID, String> outputCsvPath = new HashMap<>();
 
+    private static final String FILE_PATH =
+            String.format("%s/import/import_%s.csv", OfficeImportService.tmp, LocalDateTime.now());
     private static final String EXPORT_FILE_PATH =
             String.format("%s%sexport%sexport_%s.csv",
                     tmp,
@@ -100,7 +103,6 @@ public class OfficeImportService {
                                 contacts.add(contact);
                             });
                         }
-
                         offices.add(office);
                     });
         } catch (Exception e) {
@@ -127,7 +129,6 @@ public class OfficeImportService {
             status.put(uuid, ImportStatus.FAILED);
             throw new RuntimeException(e);
         }
-
     }
 
     public void getCsv(UUID uuid, OfficePage officePage) {
@@ -168,4 +169,31 @@ public class OfficeImportService {
     public String getFilePath(UUID uuid) {
         return outputCsvPath.get(uuid);
     }
+
+    public UUID importCsvToDB(MultipartFile file) {
+        try {
+            file.transferTo(Paths.get(FILE_PATH));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        UUID uuid = UUID.randomUUID();
+        Runnable task = () -> {
+            List<Object> beans = getBeansFromCsv(FILE_PATH, uuid);
+            saveBeans(beans, uuid);
+        };
+        Thread thread = new Thread(task);
+        thread.start();
+        return uuid;
+    }
+
+    public UUID exportFromDBToCsv(OfficePage officePage) {
+        UUID uuid = UUID.randomUUID();
+        Runnable task = () -> {
+            getCsv(uuid, officePage);
+        };
+        Thread thread = new Thread(task);
+        thread.start();
+        return uuid;
+    }
+
 }

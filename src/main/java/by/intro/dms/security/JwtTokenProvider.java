@@ -55,11 +55,10 @@ public class JwtTokenProvider {
         try {
             Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return !claimsJws.getBody().getExpiration().before(new Date());
-//        } catch (JwtException | IllegalArgumentException e) {
-        } catch (Exception e) {
-            throw new ApiRequestException("JWT token is expired or invalid");
-//            return false;
+        } catch (MalformedJwtException | IllegalArgumentException e) {
+            System.err.println(e.getMessage());
         }
+        return false;
     }
 
     public Authentication getAuthentication(String token) {
