@@ -5,6 +5,8 @@ import by.intro.dms.model.office.OfficePage;
 import by.intro.dms.model.response.OfficesListResponse;
 import by.intro.dms.service.office.OfficeImportService;
 import by.intro.dms.service.office.OfficeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,9 +20,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.UUID;
 
+
 @RestController
 @RequestMapping(value = "/api/v1/offices", produces = MediaType.APPLICATION_JSON_VALUE)
 public class OfficeController {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OfficeController.class.getName());
 
     private final OfficeService officeService;
     private final OfficeImportService officeImportService;
@@ -32,6 +37,7 @@ public class OfficeController {
 
     @GetMapping
     public OfficesListResponse getOffices(OfficePage officePage) {
+        LOG.info("test log");
         return officeService.getOffices(officePage);
     }
 

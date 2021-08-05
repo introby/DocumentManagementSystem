@@ -39,6 +39,10 @@ logging:
 #        web:
 #          TRACE
     org.zalando.logbook: TRACE
+  file:
+    name: ${LOGS_FOLDER:/home/user/logs}/elk-stack.log
+#    name: /home/user/logs/elk-stack.log
+
 jwt:
   header: Authorization
   secret: secret
@@ -53,7 +57,7 @@ logbook:
     - /api/admin/**
   filter.enabled: true
   secure-filter.enabled: true
-  format.style: http
+  format.style: json
   strategy: body-only-if-status-at-least
   minimum-status: 400
   obfuscate:

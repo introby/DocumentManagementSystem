@@ -20,6 +20,8 @@ services:
     depends_on:
       - db
       - mongodb
+    networks:
+      - elk
   db:
     image: postgres:13.3-alpine
     ports:
@@ -28,6 +30,8 @@ services:
       - POSTGRES_DB=dms
       - POSTGRES_USERNAME=postgres
       - POSTGRES_PASSWORD=postgres
+    networks:
+      - elk
   mongodb:
     image: mongo
     container_name: mongodb
@@ -38,3 +42,9 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=admin
       - MONGO_DB=dms_mongo
+    networks:
+      - elk
+
+networks:
+  elk:
+    driver: bridge
