@@ -19,30 +19,27 @@ import java.util.List;
 public class FileController {
 
     private final FileService fileService;
-    private final FileMapperImpl fileMapper;
 
-    public FileController(FileService fileService, FileMapperImpl fileMapper) {
+    public FileController(FileService fileService) {
         this.fileService = fileService;
-        this.fileMapper = fileMapper;
     }
 
     @PostMapping
     public ResponseEntity<FileDto> addFile(@RequestBody final FileDto fileDto) {
-        File file = fileService.add(fileMapper.dtoToFile(fileDto));
-        return new ResponseEntity<>(fileMapper.fileToFileDto(file), HttpStatus.OK);
+        FileDto addedFileDto = fileService.add(fileDto);
+        return new ResponseEntity<>(addedFileDto, HttpStatus.OK);
     }
 
     @GetMapping
     public ResponseEntity<List<FileDto>> getFiles() {
-        List<File> files = fileService.findAll();
-        List<FileDto> dtoList = fileMapper.toDtoList(files);
-        return new ResponseEntity<>(dtoList, HttpStatus.OK);
+        List<FileDto> files = fileService.findAll();
+        return new ResponseEntity<>(files, HttpStatus.OK);
     }
 
     @GetMapping(value = "{id}")
     public ResponseEntity<FileDto> getFile(@PathVariable final ObjectId id) throws NoEntityException {
-        File file = fileService.findById(id);
-        return new ResponseEntity<>(fileMapper.fileToFileDto(file), HttpStatus.OK);
+        FileDto fileDto = fileService.findById(id);
+        return new ResponseEntity<>((fileDto), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "{id}")
@@ -55,10 +52,8 @@ public class FileController {
     @PutMapping(value = "{id}")
     public ResponseEntity<FileDto> editFile(@PathVariable final ObjectId id,
                                             @RequestBody final FileDto fileDto) throws NoEntityException {
-        File file = fileService.findById(id);
-        file.setCreationDate(fileDto.getCreationDate());
-        file.setContent(fileDto.getContent());
-        File editedFile = fileService.update(file);
-        return new ResponseEntity<>(fileMapper.fileToFileDto(editedFile), HttpStatus.OK);
+
+        FileDto editedFile = fileService.update(id, fileDto);
+        return new ResponseEntity<>(editedFile, HttpStatus.OK);
     }
 }

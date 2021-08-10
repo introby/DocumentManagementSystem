@@ -27,6 +27,22 @@ spring:
   mvc:
     log-request-details: off
 
+  kafka:
+    consumer:
+      group-id: server.broadcast
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+kafka:
+  bootstrap-server: localhost:9092
+  topic:
+    requestreply-topic: requestreply-topic
+    request-topic: request-topic
+
 app:
   cache-timeout: 300000
 
