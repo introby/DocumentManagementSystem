@@ -8,6 +8,6 @@ public class DocumentPage {
     private int pageNumber = 0;
     private int pageSize = 6;
     private Sort.Direction sortDirection = Sort.Direction.ASC;
-    private String sortBy = "documentName";
+    private DocumentFields sortBy = DocumentFields.DOCUMENT_NAME;
 
 }

@@ -10,7 +10,7 @@ public class PaginationUtils {
                 .pageSize(page.getSize())
                 .pageNumber(page.getNumber())
                 .totalPages(page.getTotalPages())
-                .totalElements(page.getNumberOfElements())
+                .totalElements((int) page.getTotalElements())
                 .build();
     }
 

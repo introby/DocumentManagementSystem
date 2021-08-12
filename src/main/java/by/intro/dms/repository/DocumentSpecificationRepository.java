@@ -1,17 +1,21 @@
 package by.intro.dms.repository;
 
 import by.intro.dms.model.*;
-import by.intro.dms.model.CurrencyEnum;
 import by.intro.dms.model.request.DocumentRequest;
 import by.intro.dms.service.CurrencyService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Repository
 public class DocumentSpecificationRepository {
@@ -51,28 +55,26 @@ public class DocumentSpecificationRepository {
 
         CurrencyEnum currencyEnum = documentSearchCriteria.getCurrencyEnum();
 
-        if (Objects.nonNull(currencyEnum) && currencyEnum != CurrencyEnum.EUR) {
-            return priceConverter(pageable, specificationList, currencyEnum);
-        }
-
-        return documentRepository.findAll(
+        Page<Document> result = documentRepository.findAll(
                 Specification.where(specificationList.stream().reduce((Specification::and)).get()),
                 pageable
         );
+
+        if (Objects.nonNull(currencyEnum) && currencyEnum != CurrencyEnum.EUR) {
+            priceConverter(result, currencyEnum);
+        }
+        return result;
     }
 
     @NotNull
-    private Page<Document> priceConverter(Pageable pageable, List<Specification<Document>> specificationList, CurrencyEnum currencyEnum) {
-        Page<Document> pageList = documentRepository.findAll(
-                Specification.where(specificationList.stream().reduce((Specification::and)).get()),
-                pageable);
+    private Page<Document> priceConverter(Page<Document> result, CurrencyEnum currencyEnum) {
 
-        pageList.stream().forEach(document -> {
+        result.stream().forEach(document -> {
             document.setPrice(document.getPrice() * currencyService.convertCurrency(currencyEnum));
             document.setCurrencyEnum(currencyEnum);
         });
 
-        return pageList;
+        return result;
     }
 
     private Specification<Document> documentNameLike(String documentName) {
@@ -110,7 +112,7 @@ public class DocumentSpecificationRepository {
     }
 
     private Pageable getPageable(DocumentPage documentPage) {
-        Sort sort = Sort.by(documentPage.getSortDirection(), documentPage.getSortBy());
+        Sort sort = Sort.by(documentPage.getSortDirection(), documentPage.getSortBy().getCriteriaFieldName());
         return PageRequest.of(documentPage.getPageNumber(), documentPage.getPageSize(), sort);
     }
 }

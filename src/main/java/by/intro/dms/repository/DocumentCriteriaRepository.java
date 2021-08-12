@@ -95,14 +95,14 @@ public class DocumentCriteriaRepository {
                           CriteriaQuery<Document> criteriaQuery,
                           Root<Document> documentRoot) {
         if (documentPage.getSortDirection().equals(Sort.Direction.ASC)) {
-            criteriaQuery.orderBy(criteriaBuilder.asc(documentRoot.get(documentPage.getSortBy())));
+            criteriaQuery.orderBy(criteriaBuilder.asc(documentRoot.get(documentPage.getSortBy().getCriteriaFieldName())));
         } else {
-            criteriaQuery.orderBy(criteriaBuilder.desc(documentRoot.get(documentPage.getSortBy())));
+            criteriaQuery.orderBy(criteriaBuilder.desc(documentRoot.get(documentPage.getSortBy().getCriteriaFieldName())));
         }
     }
 
     private Pageable getPageable(DocumentPage documentPage) {
-        Sort sort = Sort.by(documentPage.getSortDirection(), documentPage.getSortBy());
+        Sort sort = Sort.by(documentPage.getSortDirection(), documentPage.getSortBy().getCriteriaFieldName());
         return PageRequest.of(documentPage.getPageNumber(), documentPage.getPageSize(), sort);
     }
 

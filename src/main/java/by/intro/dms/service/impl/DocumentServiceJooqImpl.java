@@ -11,10 +11,10 @@ import by.intro.dms.repository.DocumentSpecificationRepository;
 import by.intro.dms.service.CurrencyService;
 import by.intro.dms.service.DocumentService;
 import org.jetbrains.annotations.NotNull;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -50,9 +50,11 @@ public class DocumentServiceJooqImpl extends DocumentService {
         }
         int pageSize = documentPage.getPageSize();
         int pageNumber = documentPage.getPageNumber();
+        Sort.Direction sortDirection = documentPage.getSortDirection();
+        Field<Object> sortField = DSL.field(documentPage.getSortBy().getJooqFieldName());
         List<Document> documents = dsl.selectFrom(Documents.DOCUMENTS)
                 .where(condition(documentRequest))
-                .orderBy(Documents.DOCUMENTS.DOCUMENT_NAME.asc())
+                .orderBy(setSortingDirection(sortField, sortDirection))
                 .limit(pageSize).offset(pageSize * pageNumber)
                 .fetch()
                 .into(Document.class);
@@ -116,29 +118,13 @@ public class DocumentServiceJooqImpl extends DocumentService {
         return result;
     }
 
-//    private SortField<?> getSortFields(String sortFieldName, Sort.Direction sortDirection) {
-//        TableField tableField = getTableField(sortFieldName);
-//        return convertTableFieldToSortField(tableField, sortDirection);
-//    }
-//
-//    private TableField getTableField(String sortFieldName) {
-//        TableField sortField = null;
-//        try {
-//            Field tableField = Documents.DOCUMENTS.getClass().getField(sortFieldName);
-//            sortField = (TableField) tableField.get(Documents.DOCUMENTS);
-//        } catch (NoSuchFieldException | IllegalAccessException ex) {
-//            String errorMessage = String.format("Could not find table field: {}", sortFieldName);
-//            throw new InvalidDataAccessApiUsageException(errorMessage, ex);
-//        }
-//
-//        return sortField;
-//    }
-//
-//    private SortField<?> convertTableFieldToSortField(TableField tableField, Sort.Direction sortDirection) {
-//        if (sortDirection == Sort.Direction.ASC) {
-//            return tableField.asc();
-//        } else {
-//            return tableField.desc();
-//        }
-//    }
+    public SortField<?> setSortingDirection(Field field, Sort.Direction sortDirection) {
+        if (sortDirection == Sort.Direction.ASC) {
+            return field.asc();
+        }
+        else {
+            return field.desc();
+        }
+    }
+
 }
