@@ -4,6 +4,7 @@ import by.intro.dms.model.*;
 import by.intro.dms.model.CurrencyEnum;
 import by.intro.dms.model.request.DocumentRequest;
 import by.intro.dms.service.CurrencyService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
@@ -51,22 +52,27 @@ public class DocumentSpecificationRepository {
         CurrencyEnum currencyEnum = documentSearchCriteria.getCurrencyEnum();
 
         if (Objects.nonNull(currencyEnum) && currencyEnum != CurrencyEnum.EUR) {
-            Page<Document> pageList = documentRepository.findAll(
-                    Specification.where(specificationList.stream().reduce((Specification::and)).get()),
-                    pageable);
-
-            pageList.stream().forEach(document -> {
-                document.setPrice(document.getPrice() * currencyService.convertCurrency(currencyEnum));
-                document.setCurrencyEnum(currencyEnum);
-            });
-
-            return pageList;
+            return priceConverter(pageable, specificationList, currencyEnum);
         }
 
         return documentRepository.findAll(
                 Specification.where(specificationList.stream().reduce((Specification::and)).get()),
                 pageable
         );
+    }
+
+    @NotNull
+    private Page<Document> priceConverter(Pageable pageable, List<Specification<Document>> specificationList, CurrencyEnum currencyEnum) {
+        Page<Document> pageList = documentRepository.findAll(
+                Specification.where(specificationList.stream().reduce((Specification::and)).get()),
+                pageable);
+
+        pageList.stream().forEach(document -> {
+            document.setPrice(document.getPrice() * currencyService.convertCurrency(currencyEnum));
+            document.setCurrencyEnum(currencyEnum);
+        });
+
+        return pageList;
     }
 
     private Specification<Document> documentNameLike(String documentName) {

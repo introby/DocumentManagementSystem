@@ -13,4 +13,13 @@ public class PaginationUtils {
                 .totalElements(page.getNumberOfElements())
                 .build();
     }
+
+    public static PaginationInfo buildPaginationInfo(int totalElements, int totalPages, int pageNumber, int pageSize) {
+        return PaginationInfo.builder()
+                .pageSize(pageSize)
+                .pageNumber(pageNumber)
+                .totalPages(totalPages)
+                .totalElements(totalElements)
+                .build();
+    }
 }

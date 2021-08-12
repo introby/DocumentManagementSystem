@@ -21,11 +21,11 @@ import static by.intro.dms.service.PaginationUtils.buildPaginationInfo;
 @Service
 public class DocumentService {
 
-    private final DocumentRepository documentRepository;
-    private final EntityManager entityManager;
-    private final DocumentCriteriaRepository documentCriteriaRepository;
-    private final DocumentSpecificationRepository documentSpecificationRepository;
-    private final DocumentMapper documentMapper;
+    protected final DocumentRepository documentRepository;
+    protected final EntityManager entityManager;
+    protected final DocumentCriteriaRepository documentCriteriaRepository;
+    protected final DocumentSpecificationRepository documentSpecificationRepository;
+    protected final DocumentMapper documentMapper;
 
     public DocumentService(DocumentRepository documentRepository,
                            EntityManager entityManager,
