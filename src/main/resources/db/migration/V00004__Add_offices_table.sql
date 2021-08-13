@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS offices CASCADE;
+
 CREATE TABLE offices
 (
     id                SERIAL,

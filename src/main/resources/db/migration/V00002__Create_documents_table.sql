@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS documents CASCADE;
+
 CREATE TABLE documents (
     document_id SERIAL,
     document_name varchar(200) NOT NULL,

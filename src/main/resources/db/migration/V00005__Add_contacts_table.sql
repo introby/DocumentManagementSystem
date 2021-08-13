@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS contacts CASCADE;
+
 CREATE TABLE contacts
 (
     id        SERIAL,
