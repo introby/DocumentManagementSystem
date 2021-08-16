@@ -21,6 +21,9 @@
         <db.url>jdbc:postgresql://localhost:5432/dms</db.url>
         <db.username>postgres</db.username>
         <db.password>postgres</db.password>
+<!--        <db.url>${env.POST}</db.url>-->
+<!--        <db.username>${env.POSTGRES_USERNAME}</db.username>-->
+<!--        <db.password>${env.POSTGRES_PASSWORD}</db.password>-->
     </properties>
     <dependencies>
         <dependency>
@@ -44,6 +47,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
+            <version>7.13.0</version>
         </dependency>
 
         <dependency>
@@ -51,11 +55,11 @@
             <artifactId>springfox-boot-starter</artifactId>
             <version>3.0.0</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springdoc</groupId>-->
-<!--            <artifactId>springdoc-openapi-ui</artifactId>-->
-<!--            <version>1.5.9</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.springdoc</groupId>-->
+        <!--            <artifactId>springdoc-openapi-ui</artifactId>-->
+        <!--            <version>1.5.9</version>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -233,7 +237,32 @@
                             <artifactId>hibernate-jpamodelgen</artifactId>
                             <version>5.4.32.Final</version>
                         </path>
+
                     </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>7.13.0</version>
+
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>migrate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+                <configuration>
+                    <url>${db.url}</url>
+                    <user>${db.username}</user>
+                    <password>${db.password}</password>
+                    <locations>
+                        <location>filesystem:src/main/resources/db/migration</location>
+                    </locations>
+                    <baselineOnMigrate>true</baselineOnMigrate>
                 </configuration>
             </plugin>
             <plugin>

@@ -61,13 +61,13 @@ public class DocumentSpecificationRepository {
         );
 
         if (Objects.nonNull(currencyEnum) && currencyEnum != CurrencyEnum.EUR) {
-            priceConverter(result, currencyEnum);
+            convertPriceToOtherCurrency(result, currencyEnum);
         }
         return result;
     }
 
     @NotNull
-    private Page<Document> priceConverter(Page<Document> result, CurrencyEnum currencyEnum) {
+    private Page<Document> convertPriceToOtherCurrency(Page<Document> result, CurrencyEnum currencyEnum) {
 
         result.stream().forEach(document -> {
             document.setPrice(document.getPrice() * currencyService.convertCurrency(currencyEnum));

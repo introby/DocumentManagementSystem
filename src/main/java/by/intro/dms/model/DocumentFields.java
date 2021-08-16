@@ -1,5 +1,10 @@
 package by.intro.dms.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
+@Getter
 public enum DocumentFields {
 
     DOCUMENT_NAME("document_name", "documentName"),
@@ -12,19 +17,7 @@ public enum DocumentFields {
     DESCRIPTION("description", "description"),
     PRICE("price", "price");
 
-    String jooqFieldName;
-    String criteriaFieldName;
+    private final String jooqFieldName;
+    private final String criteriaFieldName;
 
-    DocumentFields(String jooqFieldName, String criteriaFieldName) {
-        this.jooqFieldName = jooqFieldName;
-        this.criteriaFieldName = criteriaFieldName;
-    }
-
-    public String getJooqFieldName() {
-        return jooqFieldName;
-    }
-
-    public String getCriteriaFieldName() {
-        return criteriaFieldName;
-    }
 }

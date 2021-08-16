@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS vw CASCADE;
-
 CREATE TABLE vw
 (
     id                  SERIAL,

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/api/v1/autos", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/cars", produces = MediaType.APPLICATION_JSON_VALUE)
 public class CarController {
 
     private final CarService carService;
@@ -19,7 +19,7 @@ public class CarController {
     }
 
     @GetMapping()
-    public CarResponse getAutos(CarRequest request) {
+    public CarResponse getCars(CarRequest request) {
         return carService.findAll(request);
     }
 }

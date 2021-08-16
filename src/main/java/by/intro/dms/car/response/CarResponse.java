@@ -1,6 +1,6 @@
 package by.intro.dms.car.response;
 
-import by.intro.dms.car.model.CarDto;
+import by.intro.dms.car.model.dto.CarDto;
 import by.intro.dms.model.PaginationInfo;
 import lombok.Builder;
 import lombok.Data;
@@ -12,5 +12,5 @@ import java.util.List;
 public class CarResponse {
 
     private PaginationInfo paginationInfo;
-    private List<CarDto> autos;
+    private List<CarDto> cars;
 }

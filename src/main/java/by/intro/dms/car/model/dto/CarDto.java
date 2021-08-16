@@ -1,4 +1,4 @@
-package by.intro.dms.car.model;
+package by.intro.dms.car.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;

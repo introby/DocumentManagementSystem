@@ -21,6 +21,7 @@ import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static by.intro.dms.service.PaginationUtils.buildPaginationInfo;
 
@@ -44,17 +45,14 @@ public class DocumentServiceJooqImpl extends DocumentService {
 
     @Override
     public DocumentsListResponse getDocumentsSpecification(DocumentRequest documentRequest) {
-        DocumentPage documentPage = documentRequest.getDocumentPage();
-        if (Objects.isNull(documentPage)) {
-            documentPage = new DocumentPage();
-        }
+        DocumentPage documentPage = Optional.of(documentRequest.getDocumentPage()).orElse(new DocumentPage());
         int pageSize = documentPage.getPageSize();
         int pageNumber = documentPage.getPageNumber();
         Sort.Direction sortDirection = documentPage.getSortDirection();
         Field<Object> sortField = DSL.field(documentPage.getSortBy().getJooqFieldName());
         List<Document> documents = dsl.selectFrom(Documents.DOCUMENTS)
-                .where(condition(documentRequest))
-                .orderBy(setSortingDirection(sortField, sortDirection))
+                .where(buildCondition(documentRequest))
+                .orderBy(buildSortExpression(sortField, sortDirection))
                 .limit(pageSize).offset(pageSize * pageNumber)
                 .fetch()
                 .into(Document.class);
@@ -65,13 +63,13 @@ public class DocumentServiceJooqImpl extends DocumentService {
         CurrencyEnum currencyEnum = documentRequest.getDocumentSearchCriteria().getCurrencyEnum();
         List<Document> finalDocumentList;
         if (Objects.nonNull(currencyEnum) && currencyEnum != CurrencyEnum.EUR) {
-            finalDocumentList = priceConverter(documents, currencyEnum);
+            finalDocumentList = convertPriceToOtherCurrency(documents, currencyEnum);
         } else {
             finalDocumentList = documents;
         }
 
         return DocumentsListResponse.builder()
-                .documents(documentMapper.toDtoList(finalDocumentList))
+                .documents(getDocumentMapper().toDtoList(finalDocumentList))
                 .paginationInfo(buildPaginationInfo(totalElements, totalPages, pageNumber, pageSize))
                 .currency(documentRequest.getDocumentSearchCriteria().getCurrencyEnum().name())
                 .build();
@@ -80,12 +78,12 @@ public class DocumentServiceJooqImpl extends DocumentService {
     private int findCountByExpression(DocumentRequest documentRequest) {
         return dsl.fetchCount(dsl.select()
                 .from(Documents.DOCUMENTS)
-                .where(condition(documentRequest))
+                .where(buildCondition(documentRequest))
         );
     }
 
     @NotNull
-    private List<Document> priceConverter(List<Document> documents, CurrencyEnum currencyEnum) {
+    private List<Document> convertPriceToOtherCurrency(List<Document> documents, CurrencyEnum currencyEnum) {
 
         documents.forEach(document -> {
             document.setPrice(document.getPrice() * currencyService.convertCurrency(currencyEnum));
@@ -94,7 +92,7 @@ public class DocumentServiceJooqImpl extends DocumentService {
         return documents;
     }
 
-    public Condition condition(DocumentRequest documentRequest) {
+    public Condition buildCondition(DocumentRequest documentRequest) {
         DocumentSearchCriteria documentSearchCriteria = documentRequest.getDocumentSearchCriteria();
         String documentName = documentSearchCriteria.getDocumentName();
         String consumer = documentSearchCriteria.getConsumer();
@@ -118,7 +116,7 @@ public class DocumentServiceJooqImpl extends DocumentService {
         return result;
     }
 
-    public SortField<?> setSortingDirection(Field field, Sort.Direction sortDirection) {
+    public SortField<?> buildSortExpression(Field field, Sort.Direction sortDirection) {
         if (sortDirection == Sort.Direction.ASC) {
             return field.asc();
         }

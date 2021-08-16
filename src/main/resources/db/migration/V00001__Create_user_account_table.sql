@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS user_account CASCADE;
-
 CREATE TABLE user_account (
     user_id SERIAL,
     username varchar(16) UNIQUE NOT NULL,

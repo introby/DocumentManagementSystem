@@ -1,7 +1,11 @@
 package by.intro.dms.car.service;
 
-import by.intro.dms.car.model.CarDto;
+import by.intro.dms.car.mapper.AudiMapper;
+import by.intro.dms.car.model.AudiModel;
 import by.intro.dms.car.model.CarPage;
+import by.intro.dms.car.model.dto.CarDto;
+import by.intro.dms.car.model.dto.SeatDto;
+import by.intro.dms.car.model.dto.VWDto;
 import by.intro.dms.car.request.CarRequest;
 import by.intro.dms.car.response.CarResponse;
 import by.intro.dms.model.tables.Audi;
@@ -11,7 +15,7 @@ import org.jooq.DSLContext;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 import static by.intro.dms.service.PaginationUtils.buildPaginationInfo;
 
@@ -19,46 +23,45 @@ import static by.intro.dms.service.PaginationUtils.buildPaginationInfo;
 public class CarService {
 
     private final DSLContext dsl;
+    private final AudiMapper audiMapper;
 
-    public CarService(DSLContext dsl) {
+    public CarService(DSLContext dsl, AudiMapper audiMapper) {
         this.dsl = dsl;
+        this.audiMapper = audiMapper;
     }
 
     public CarResponse findAll(CarRequest request) {
-        CarPage carPage = request.getCarPage();
-        if (Objects.isNull(carPage)) {
-            carPage = new CarPage();
-        }
+        CarPage carPage = Optional.of(request.getCarPage()).orElse(new CarPage());
+
         int pageNumber = carPage.getPageNumber();
         int pageSize = carPage.getPageSize();
-        int totalElements = findCountByExpression(request);
-        int totalPages = (int) Math.ceil(1.0 * totalElements / pageSize);
 
-        List<CarDto> carDtoList = dsl.select(Audi.AUDI.NAME, Audi.AUDI.CREATION_DATE, Audi.AUDI.COUNT)
-                .from(Audi.AUDI)
-                .unionAll(dsl.select(Vw.VW.NAME, Vw.VW.CREATION_DATE, Vw.VW.COUNT)
-                        .from(Vw.VW))
-                .unionAll(dsl.select(Seat.SEAT.NAME, Seat.SEAT.CREATION_DATE, Seat.SEAT.COUNT)
-                        .from(Seat.SEAT))
-//                .orderBy(Audi.AUDI.ID)
-                .limit(pageSize).offset(pageSize * pageNumber)
+
+        List<CarDto> vwDtoList = dsl.select(Vw.VW.NAME, Vw.VW.CREATION_DATE, Vw.VW.COUNT)
+                .from(Vw.VW)
                 .fetch()
-                .into(CarDto.class);
+                .into(VWDto.class);
+        List<CarDto> carDtoList = vwDtoList;
+
+        List<AudiModel> audiModelList = dsl.select(Audi.AUDI.AUTO_NAME, Audi.AUDI.CREATION_DATE, Audi.AUDI.COUNT)
+                .from(Audi.AUDI)
+                .fetch()
+                .into(AudiModel.class);
+
+        carDtoList.addAll(audiMapper.toAudiDtoList(audiModelList));
+
+        List<CarDto> seatDtoList = dsl.select(Seat.SEAT.NAME, Seat.SEAT.CREATION_DATE, Seat.SEAT.COUNT)
+                .from(Seat.SEAT)
+                .fetch()
+                .into(SeatDto.class);
+        carDtoList.addAll(seatDtoList);
+
+        int totalElements = carDtoList.size();
+        int totalPages = (int) Math.ceil(1.0 * totalElements / pageSize);
 
         return CarResponse.builder()
                 .paginationInfo(buildPaginationInfo(totalElements, totalPages, pageNumber, pageSize))
-                .autos(carDtoList)
+                .cars(carDtoList.subList(pageNumber * pageSize, pageNumber * pageSize + pageSize))
                 .build();
     }
-
-    private int findCountByExpression(CarRequest request) {
-        return dsl.fetchCount(dsl.select()
-                .from(Audi.AUDI)
-                .unionAll(dsl.select()
-                        .from(Vw.VW)
-                        .unionAll(dsl.select()
-                                .from(Seat.SEAT)))
-        );
-    }
-
 }

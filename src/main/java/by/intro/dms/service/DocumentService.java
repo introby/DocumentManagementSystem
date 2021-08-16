@@ -14,18 +14,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
-import java.util.Optional;
 
 import static by.intro.dms.service.PaginationUtils.buildPaginationInfo;
 
 @Service
 public class DocumentService {
 
-    protected final DocumentRepository documentRepository;
-    protected final EntityManager entityManager;
-    protected final DocumentCriteriaRepository documentCriteriaRepository;
-    protected final DocumentSpecificationRepository documentSpecificationRepository;
-    protected final DocumentMapper documentMapper;
+    private final DocumentRepository documentRepository;
+    private final EntityManager entityManager;
+    private final DocumentCriteriaRepository documentCriteriaRepository;
+    private final DocumentSpecificationRepository documentSpecificationRepository;
+    private final DocumentMapper documentMapper;
 
     public DocumentService(DocumentRepository documentRepository,
                            EntityManager entityManager,
@@ -39,18 +38,21 @@ public class DocumentService {
         this.documentMapper = documentMapper;
     }
 
+    protected DocumentMapper getDocumentMapper() {
+        return documentMapper;
+    }
+
     public Page<Document> findByKeyword(boolean isDeleted, String findValue, PageRequest pageRequest) {
         Session session = entityManager.unwrap(Session.class);
         Filter filter = session.enableFilter("deletedDocumentFilter");
         filter.setParameter("isDeleted", isDeleted);
-        Page<Document> products =  documentRepository.findByKeyword(findValue, pageRequest);
+        Page<Document> products = documentRepository.findByKeyword(findValue, pageRequest);
         session.disableFilter("deletedDocumentFilter");
         return products;
     }
 
     public Document findById(Long documentId) {
-        Optional<Document> dop = documentRepository.findById(documentId);
-        return dop.get();
+        return documentRepository.findById(documentId).orElseThrow();
     }
 
     public Document findBySupplier(String supplier) {
