@@ -8,6 +8,7 @@ import by.intro.dms.repository.FileRepository;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,9 @@ public class FileService {
     private final FileMapperImpl fileMapper;
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public FileService(FileRepository fileRepository, FileMapperImpl fileMapper, KafkaTemplate<String, Object> kafkaTemplate) {
+    public FileService(FileRepository fileRepository,
+                       FileMapperImpl fileMapper,
+                       @Qualifier("kafkaTemplate") KafkaTemplate<String, Object> kafkaTemplate) { //KafkaTemplate from autoconfiguration
         this.fileRepository = fileRepository;
         this.fileMapper = fileMapper;
         this.kafkaTemplate = kafkaTemplate;
@@ -60,11 +63,11 @@ public class FileService {
         fileRepository.deleteById(id);
     }
 
-    public void send(FileDto dto) {
-        kafkaTemplate.send("new-files", dto);
+    public void sendMessage(FileDto dto) {
+        kafkaTemplate.send(TOPIC_NAME, dto);
     }
 
-    @KafkaListener(id = "Files", topics = {"new-files"}, containerFactory = "singleFactory")
+    @KafkaListener(id = "Files", topics = {TOPIC_NAME})
     public void consume(FileDto dto) {
         LOG.info("=> consumed {}", dto);
     }
