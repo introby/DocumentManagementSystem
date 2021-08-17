@@ -18,6 +18,7 @@ import java.util.List;
 public class FileService {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileService.class.getName());
+    private static final String TOPIC_NAME = "new-files";
 
     private final FileRepository fileRepository;
     private final FileMapperImpl fileMapper;
@@ -42,7 +43,7 @@ public class FileService {
     public FileDto add(FileDto fileDto) {
         File file = fileMapper.dtoToFile(fileDto);
         File insertedFile = fileRepository.insert(file);
-        send(fileDto);
+        sendMessage(fileDto);
         return fileMapper.fileToFileDto(insertedFile);
     }
 

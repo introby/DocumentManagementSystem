@@ -17,13 +17,10 @@
         <java.version>11</java.version>
         <testcontainer.version>1.15.3</testcontainer.version>
         <jooq.version>3.14.9</jooq.version>
-        <db.driver>org.postgresql.Driver</db.driver>
-        <db.url>jdbc:postgresql://localhost:5432/dms</db.url>
-        <db.username>postgres</db.username>
-        <db.password>postgres</db.password>
-<!--        <db.url>${env.POST}</db.url>-->
-<!--        <db.username>${env.POSTGRES_USERNAME}</db.username>-->
-<!--        <db.password>${env.POSTGRES_PASSWORD}</db.password>-->
+        <db.driver>${POSTGRES_DRIVER}</db.driver>
+        <db.url>jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}</db.url>
+        <db.username>${POSTGRES_USERNAME}</db.username>
+        <db.password>${POSTGRES_PASSWORD}</db.password>
     </properties>
     <dependencies>
         <dependency>
@@ -55,11 +52,6 @@
             <artifactId>springfox-boot-starter</artifactId>
             <version>3.0.0</version>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>org.springdoc</groupId>-->
-        <!--            <artifactId>springdoc-openapi-ui</artifactId>-->
-        <!--            <version>1.5.9</version>-->
-        <!--        </dependency>-->
 
         <dependency>
             <groupId>org.postgresql</groupId>
