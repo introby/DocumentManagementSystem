@@ -48,4 +48,5 @@ public class WebSocketAuthenticationConfig implements WebSocketMessageBrokerConf
             }
         });
     }
+
 }

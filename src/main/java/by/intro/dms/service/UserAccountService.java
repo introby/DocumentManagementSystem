@@ -9,10 +9,11 @@ import by.intro.dms.security.JwtTokenProvider;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -56,7 +57,7 @@ public class UserAccountService {
         return true;
     }
 
-//    @ExceptionHandler(ApiRequestException.class)
+    //    @ExceptionHandler(ApiRequestException.class)
     public String authenticate(AuthenticationRequestDto request) {
 
         try {
@@ -70,5 +71,12 @@ public class UserAccountService {
         } catch (AuthenticationException e) {
             throw new ApiRequestException("Authentication error");
         }
+    }
+
+    public UserAccount getAuthorizedUser() {
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = principal.getUsername();
+        Optional<UserAccount> account = userAccountRepository.findByUsername(username);
+        return account.orElseThrow(() -> new UsernameNotFoundException("Username not found"));
     }
 }

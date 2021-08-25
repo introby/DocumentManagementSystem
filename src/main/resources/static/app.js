@@ -32,14 +32,14 @@ function disconnect() {
 }
 
 function sendName() {
-    stompClient.send("/app/chat", {}, JSON.stringify({'name': $("#name").val()}));
+    stompClient.send("/app/chat", {}, JSON.stringify({'inputMessage': $("#message").val()}));
 }
 
 function showGreeting(messageOutput) {
     var response = document.getElementById('response');
     var p = document.createElement('p');
     p.style.wordWrap = 'break-word';
-    p.appendChild(document.createTextNode(messageOutput.text));
+    p.appendChild(document.createTextNode(messageOutput.firstName + ": " + messageOutput.text));
     response.appendChild(p);
 }
 
